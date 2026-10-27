@@ -1,18 +1,17 @@
 from collections import Counter
 
-from tribute import random_tributes
-from game import Game
+from src.contestant import random_contestant 
+from src.game import Game
 from events import Fight, FindItems
 
 GAMES = 10000
 
-
 def run():
-    contestants = random_tributes(5)
+    contestants = random_contestant(5)
 
     game = Game()
-    game.add_tributes(contestants)
-    game.logger.debug = True
+    game.add_contestants(contestants)
+    game.logger.debug = False
 
     fight = Fight(game)
     search = FindItems(game)
@@ -27,7 +26,7 @@ def run():
     return game, fights
 
 
-def main():
+def old_main():
     winners = Counter()
 
     total_fights = 0
@@ -68,6 +67,8 @@ def main():
         print(f"Average winner weapon: {total_weapon / winners_count:.2f}")
         print(f"Average winner armor : {total_armor / winners_count:.2f}")
 
+def main():
+    print(run())
 
 if __name__ == "__main__":
     main()

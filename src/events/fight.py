@@ -1,14 +1,14 @@
 import random
 from .event import Event
-from src.contestant import Contestant
-from src.game import Game
+from src.contestants.contestant import Contestant
+from src.contestants.grouped_contestant import GroupedContestants
 from src.logger import Logger
 
 class Fight(Event):
     def fight(self) -> tuple[Contestant, Contestant]:
         """Stage a fight between two random contestants"""
         logger: Logger = self.logger
-        game: Game = self.game
+        game: GroupedContestants = self.game
 
         contestant_a, contestant_b = game.random_group(2)
         logger.fighting(contestant_a, contestant_b)

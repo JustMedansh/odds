@@ -1,13 +1,13 @@
 from .event import Event
 from random import choices, randint
-from src.contestant import Contestant
-from src.game import Game
+from src.contestants.contestant import Contestant
+from src.contestants.grouped_contestant import GroupedContestants
 from src.logger import Logger
 
 class FindItems(Event):
     def search(self) -> Contestant:
         """Simulate an item search"""
-        game: Game = self.game
+        game: GroupedContestants = self.game
         contestant: Contestant = game.random_contestant()
 
         LOOT_TABLE = {

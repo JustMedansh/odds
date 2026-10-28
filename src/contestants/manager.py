@@ -1,13 +1,12 @@
-
 import json
 from pathlib import Path
 
-from src.contestant import Contestant
+from src.contestants.contestant import Contestant
 
 
 def get_path(filename: str) -> Path:
     """Get path of file from filename."""
-    return Path(__file__).resolve().parent.parent / "data" / filename
+    return Path(__file__).resolve().parent.parent.parent / "data" / filename
 
 
 def load_contestants(filename: str) -> list[Contestant]:

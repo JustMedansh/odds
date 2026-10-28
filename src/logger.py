@@ -1,14 +1,14 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from src.contestant import Contestant
+    from contestants.contestant import Contestant
 
 class Logger:
     def __init__(self):
-        self.debug = False
+        self.debug = True
 
     def _log(self, message: str) -> None:
-        if not self.debug:
+        if self.debug:
             print(message)
 
     def death(self, t: Contestant) -> None:
@@ -37,3 +37,9 @@ class Logger:
 
     def dmg(self, t: Contestant, amt: int) -> None:
         self._log(f"{t.name} took {amt} damage")
+
+    def won(self, t: Contestant) -> None:
+        self._log(f"{t.name} won!")
+
+    def no_win(self) -> None:
+        self._log("No one won.")

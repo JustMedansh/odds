@@ -1,8 +1,8 @@
 from src.logger import Logger
-from src.contestant import Contestant
+from src.contestants.contestant import Contestant
 import random
 
-class Game:
+class GroupedContestants:
     def __init__(self):
         # contestants -> group of contestants
         self.contestants = {}

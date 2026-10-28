@@ -1,10 +1,10 @@
 import random
-from src.contestant import Contestant
+from src.contestants.contestant import Contestant
 from src.logger import Logger
-from src.game import Game
+from src.contestants.grouped_contestant import GroupedContestants
 
 class Event:
-    def __init__(self, game: Game):
+    def __init__(self, game: GroupedContestants):
         self.game = game
         self.logger: Logger = game.logger
 

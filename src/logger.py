@@ -4,8 +4,8 @@ if TYPE_CHECKING:
     from contestants.contestant import Contestant
 
 class Logger:
-    def __init__(self):
-        self.debug = True
+    def __init__(self, debug: bool = True):
+        self.debug = debug
 
     def _log(self, message: str) -> None:
         if self.debug:

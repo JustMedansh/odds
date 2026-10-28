@@ -3,12 +3,12 @@ from src.contestants.contestant import Contestant
 import random
 
 class GroupedContestants:
-    def __init__(self):
+    def __init__(self, logger):
         # contestants -> group of contestants
         self.contestants = {}
         self.day = 1
         self.next_id = 1
-        self.logger = Logger()
+        self.logger = logger
 
     def add_contestants(self, contestants: list[Contestant]) -> None:
         """Add a list of contestants"""

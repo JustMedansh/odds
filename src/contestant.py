@@ -34,10 +34,11 @@ class Contestant:
     def take_damage(self, dmg: int) -> bool:
         """Simulate taking damage"""
         self.health -= dmg
+        self.logger.dmg(self, dmg)
+        
         if self.health <= 0:
             self.kill()
 
-        self.logger.dmg(self, dmg)
         return self.alive
 
     def kill(self) -> None:

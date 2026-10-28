@@ -1,4 +1,7 @@
-from src.contestant import Contestant
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.contestant import Contestant
 
 class Logger:
     def __init__(self):

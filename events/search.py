@@ -49,7 +49,7 @@ class FindItems(Event):
     def apply_tool(self, t: Contestant, stat: str) -> Contestant:
         """Apply given tool and notify"""
         old = getattr(t, stat)
-        tool_value = choices(range(20), weights=range(20, 0, -1))[0]
+        tool_value = choices(range(20), weights=[x**1.5 for x in range(20, 0, -1)])[0]
         self.logger.found(t, stat, tool_value)
         setattr(t, stat, max(old, tool_value))
         return t

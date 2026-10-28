@@ -2,16 +2,17 @@ from collections import Counter
 
 from src.contestant import random_contestant 
 from src.game import Game
+from src.contestant_manager import load_contestants
 from events import Fight, FindItems
 
 GAMES = 10000
 
 def run():
-    contestants = random_contestant(5)
+    contestants = load_contestants('c.json')
 
     game = Game()
     game.add_contestants(contestants)
-    game.logger.debug = False
+    game.logger.debug = True
 
     fight = Fight(game)
     search = FindItems(game)
@@ -22,6 +23,11 @@ def run():
         search.search()
         fight.fight()
         fights += 1
+
+    # try:
+    #     print(game.alive_contestants()[0].name, 'won!')
+    # except IndexError:
+    #     print("Everyone died.")
 
     return game, fights
 
@@ -39,7 +45,7 @@ def old_main():
 
         total_fights += fights
 
-        alive = game.alive_tributes()
+        alive = game.alive_contestants()
 
         if not alive:
             winners["No Winner"] += 1
@@ -68,7 +74,8 @@ def old_main():
         print(f"Average winner armor : {total_armor / winners_count:.2f}")
 
 def main():
-    print(run())
+    run()
 
 if __name__ == "__main__":
-    main()
+    old_main()
+    # main()

@@ -57,6 +57,7 @@ class Fight(Event):
             )
 
         return False
+    
     def calculate_damage(self, power_a: int, power_b: int) -> int:
         """Calculate damage taken by the weaker contestant"""
         random_value = 10
@@ -71,16 +72,8 @@ class Fight(Event):
 
     def check_death(self, contestant_a: Contestant, contestant_b: Contestant) -> bool:
         """Return True if either contestant dies."""
-        logger: Logger = self.logger
-
         if contestant_a.alive and contestant_b.alive:
             return False
-
-        if not contestant_a.alive:
-            logger.death(contestant_a)
-
-        if not contestant_b.alive:
-            logger.death(contestant_b)
 
         return True
 
@@ -91,9 +84,10 @@ class Fight(Event):
         self.logger.hit(target, attacker)
         target.take_damage(damage)
 
-        if target.alive and random.random() < 0.1:
-            self.logger.run_away(target)
-            return True
+        if target.alive:
+            if (random.random() < 0.1) or (target.health < random.randint(10, 30) and random.random() < 0.95):
+                self.logger.run_away(target)
+                return True
 
         return False
 

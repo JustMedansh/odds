@@ -18,7 +18,7 @@ class Logger:
         self._log(f"{t.name} ran away.")
 
     def hit(self, defender: Contestant, attacker: Contestant) -> None:
-        self._log(f"{defender.name} was hit by {attacker.name}. Health: {defender.health}")
+        self._log(f"{defender.name} was hit by {attacker.name}.")
 
     def dmg_both(self, t1: Contestant, t2: Contestant) -> None:
         self._log(f"Both {t1.name} and {t2.name} took damage.")
@@ -36,10 +36,14 @@ class Logger:
         self._log(f"{t.name} healed {amt}. Health: {t.health}")
 
     def dmg(self, t: Contestant, amt: int) -> None:
-        self._log(f"{t.name} took {amt} damage")
+        if amt != 0:
+            self._log(f"{t.name} took {amt} damage")
 
     def won(self, t: Contestant) -> None:
         self._log(f"{t.name} won!")
 
     def no_win(self) -> None:
         self._log("No one won.")
+
+    def chose(self, t, message) -> None:
+        self._log(f"{t.name} chose to {message}")

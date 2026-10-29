@@ -12,6 +12,11 @@ from src.logger import Logger
 # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
 class Fight(Event):
+    def reset_multipliers(self, *contestants: Contestant):
+        for c in contestants:
+            c.damage_multiplier = 1
+            c.health_multiplier = 1
+
     def fight(self, c1: Contestant, c2: Contestant) -> tuple[Contestant, Contestant]:
         """Stage a fight between two random contestants"""
         logger: Logger = self.logger
@@ -21,10 +26,8 @@ class Fight(Event):
         logger.fighting(contestant_a, contestant_b)
 
         while True:
+            self.reset_multipliers(contestant_a, contestant_b)
             if self.resolve_turn(contestant_a, contestant_b):
-                return contestant_a, contestant_b
-
-            if self.check_death(contestant_a, contestant_b):
                 return contestant_a, contestant_b
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:
@@ -36,37 +39,74 @@ class Fight(Event):
             "weapon": 3,
         }
 
+        fight_dispatcher = {
+            'FLEE': self.flee_handler,
+            'ATTACK': self.attack_handler,
+            'DEFEND': self.defend_handler,
+            'DODGE': self.dodge_handler
+        }
+
+        choice_a = contestant_a.make_decision_fight(contestant_b)
+        choice_b = contestant_b.make_decision_fight(contestant_a)
+
+        result_a = fight_dispatcher[choice_a](contestant_a)
+        result_b = fight_dispatcher[choice_b](contestant_b)
+
+        if not (result_a or result_b):
+            return contestant_a, contestant_b
+
+        if (self.resolve_hit(contestant_a, contestant_b, weights) or 
+            self.resolve_hit(contestant_b, contestant_a, weights)):
+            return contestant_a, contestant_b
+
+        return False
+
+    def resolve_hit(self, contestant_a: Contestant, contestant_b: Contestant, weights: dict):
         power_a = self.get_power(contestant_a, weights)
         power_b = self.get_power(contestant_b, weights)
         damage = self.calculate_damage(power_a, power_b)
 
-        if power_a > power_b:
-            if self.attack(
-                contestant_a,
-                contestant_b,
-                damage - contestant_b.armor,
-            ):
-                return contestant_a, contestant_b
+        total_damage = (damage - contestant_b.armor) * contestant_a.damage_multiplier * contestant_b.health_multiplier
+        if power_a < power_b - random.randint(0, 15):
+            total_damage //= 3
 
-        elif power_b > power_a:
-            if self.attack(
-                contestant_b,
-                contestant_a,
-                damage - contestant_a.armor,
-            ):
-                return contestant_a, contestant_b
-            
-        else:
-            self.attack_when_tie(
-                contestant_a,
-                contestant_b,
-                damage,
-            )
+        total_damage = round(total_damage)
 
+        if self.attack(
+            contestant_a,
+            contestant_b,
+            total_damage,
+        ):
+            return contestant_a, contestant_b
+
+        if self.check_death(contestant_a, contestant_b):
+            return contestant_a, contestant_b
+                    
         return False
 
-    def attack_handler(self):
-        ...
+    def defend_handler(self, c: Contestant):
+        c.damage_multiplier = 0.2
+        c.health_multiplier = float(random.randint(5, 8) / 10)
+        return True # to ensure flee works
+
+    def attack_handler(self, c: Contestant):
+        return True
+
+    def dodge_handler(self, c: Contestant):
+        c.damage_multiplier = 0.2
+        dodge_chance = random.random()
+        if dodge_chance < 0.5:
+            c.health_multiplier = 0
+
+        return True
+
+    def flee_handler(self, c: Contestant):
+        c.damage_multiplier = 0.2
+        flee_chance = random.random()
+        if flee_chance < 0.8:
+            self.logger.run_away(c)
+            return False
+        return True
     
     def calculate_damage(self, power_a: int, power_b: int) -> int:
         """Calculate damage taken by the weaker contestant"""
@@ -91,23 +131,11 @@ class Fight(Event):
         """Returns True if the target runs away, otherwise False."""
         damage = max(0, damage)
 
-        self.logger.hit(target, attacker)
+        if damage != 0:
+            self.logger.hit(target, attacker)
         target.take_damage(damage)
 
-        if target.alive:
-            if (random.random() < 0.1) or (target.health < random.randint(10, 30) and random.random() < 0.95):
-                self.logger.run_away(target)
-                return True
-
         return False
-
-    def attack_when_tie(self, contestant_a: Contestant, contestant_b: Contestant, damage: int) -> None:
-        """Allow taking damage when powers are equal"""
-        damage = max(0, damage // 2)
-
-        self.logger.dmg_both(contestant_a, contestant_b)
-        contestant_a.take_damage(damage)
-        contestant_b.take_damage(damage)
 
 # class CombatEntity:
 #     """A class managing combat for a contestant or group of contestants"""

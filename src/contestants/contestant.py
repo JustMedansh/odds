@@ -22,6 +22,9 @@ class Contestant:
         self.allies = []
         self.enemies = []
 
+        self.damage_multiplier = 1
+        self.health_multiplier = 1
+
     def __str__(self):
         attrs = []
         for name, value in self.__dict__.items():
@@ -62,7 +65,9 @@ class Contestant:
         # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
         # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-        return random.choice('ATTACK', 'FLEE', 'DEFEND', 'DODGE') # temporary
+        chose =  random.choice(['ATTACK', 'FLEE', 'DEFEND', 'DODGE']) # temporary
+        self.logger.chose(self, chose)
+        return chose
 
 
 def random_contestant(count: int) -> list[Contestant]:

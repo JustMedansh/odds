@@ -12,7 +12,7 @@ def run_statistics() -> None:
     total_armor = 0
 
     for _ in range(GAMES):
-        game, fights = run_simulation()
+        game, fights = run_simulation(False)
 
         total_fights += fights
 

@@ -31,7 +31,7 @@ class GroupedContestants:
         """Return a dict of all the contestants"""
         return self.contestants
 
-    def alive_contestants(self) -> list[Contestant]:
+    def get_alive_contestants(self) -> list[Contestant]:
         """Return a list of alive contestants"""
         return [
             contestant
@@ -39,7 +39,7 @@ class GroupedContestants:
             if contestant.alive
         ]
 
-    def dead_contestants(self) -> list[Contestant]:
+    def get_dead_contestants(self) -> list[Contestant]:
         """Return a list of dead contestants"""
         return [
             contestant
@@ -49,19 +49,19 @@ class GroupedContestants:
 
     def random_contestant(self) -> Contestant:
         """Return a random contestant from alive contestants."""
-        return random.choice(self.alive_contestants())
+        return random.choice(self.get_alive_contestants())
 
     def random_group(self, number_of_contestants: int) -> list[Contestant]:
         """Return a random group of contestants from alive contestants."""
         return random.sample(
-            self.alive_contestants(),
+            self.get_alive_contestants(),
             k=number_of_contestants
         )
 
     def count_dead(self) -> int:
         """Return number of dead contestants"""
-        return len(self.dead_contestants())
+        return len(self.get_dead_contestants())
 
     def count_alive(self) -> int:
         """Return number of alive contestants"""
-        return len(self.alive_contestants())
+        return len(self.get_alive_contestants())

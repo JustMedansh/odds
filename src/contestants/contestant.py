@@ -13,13 +13,14 @@ class Contestant:
         self.gender = gender
         self.health = 100
         self.alive = True
-        self.alliance = []
-        self.enemies = []
         self.skills = skills.copy() if skills is not None else SKILLS.copy()
         self.logger = Logger()
 
         self.armor = 0
         self.weapon = 0
+
+        self.allies = []
+        self.enemies = []
 
     def __str__(self):
         attrs = []
@@ -54,6 +55,15 @@ class Contestant:
 
         self.health = min(100, self.health + amt)
         self.logger.heal(self, amt)
+
+    def make_decision_fight(self, opponent: Contestant) -> str:
+        # FLEE: 30% chance of failing, but the fight ends. Else, full damage to contestant and third of original damage to opponent
+        # ATTACK: Proceed wiht normal attack
+        # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
+        # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
+
+        return random.choice('ATTACK', 'FLEE', 'DEFEND', 'DODGE') # temporary
+
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

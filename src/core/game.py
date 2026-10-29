@@ -25,14 +25,15 @@ class Game:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
             self.search.search()
-            self.fight.fight()
+            c1, c2 = tuple(self.gc.random_group(2))
+            self.fight.fight(c1, c2)
             self.fights += 1
 
         return self.gc, self.fights, self.get_winner()
 
     def get_winner(self) -> Contestant | None:
         """Determine and return the winner, if any."""
-        winners = self.gc.alive_contestants()
+        winners = self.gc.get_alive_contestants()
 
         if winners:
             self.gc.logger.won(winners[0])

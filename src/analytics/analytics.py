@@ -16,7 +16,7 @@ def run_statistics() -> None:
 
         total_fights += fights
 
-        alive = game.alive_contestants()
+        alive = game.get_alive_contestants()
 
         if not alive:
             winners["No Winner"] += 1

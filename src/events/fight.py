@@ -52,12 +52,19 @@ class Fight(Event):
         result_a = fight_dispatcher[choice_a](contestant_a)
         result_b = fight_dispatcher[choice_b](contestant_b)
 
-        if not (result_a or result_b):
+        resolve_hit_a = (choice_a == 'ATTACK')
+        resolve_hit_b = (choice_b == 'ATTACK')
+
+        if not result_a or not result_b:
             return contestant_a, contestant_b
 
-        if (self.resolve_hit(contestant_a, contestant_b, weights) or 
-            self.resolve_hit(contestant_b, contestant_a, weights)):
-            return contestant_a, contestant_b
+        if resolve_hit_a:
+            if self.resolve_hit(contestant_a, contestant_b, weights):
+                return contestant_a, contestant_b
+
+        if resolve_hit_b:
+            if self.resolve_hit(contestant_b, contestant_a, weights):
+                return contestant_a, contestant_b
 
         return False
 

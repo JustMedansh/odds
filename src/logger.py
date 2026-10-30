@@ -6,10 +6,12 @@ if TYPE_CHECKING:
 class Logger:
     def __init__(self, debug: bool = True):
         self.debug = debug
+        self.print_important = True
 
-    def _log(self, message: str) -> None:
+    def _log(self, message: str, important: bool = True) -> None:
         if self.debug:
-            print(message)
+            if not self.print_important or important:
+                print(message)
 
     def death(self, t: Contestant) -> None:
         self._log(f"{t.name} died")
@@ -18,7 +20,7 @@ class Logger:
         self._log(f"{t.name} ran away.")
 
     def hit(self, defender: Contestant, attacker: Contestant) -> None:
-        self._log(f"{defender.name} was hit by {attacker.name}.")
+        self._log(f"{defender.name} was hit by {attacker.name}.", False)
 
     def dmg_both(self, t1: Contestant, t2: Contestant) -> None:
         self._log(f"Both {t1.name} and {t2.name} took damage.")
@@ -33,11 +35,11 @@ class Logger:
             self._log(f"{t.name} found {loot}")
         
     def heal(self, t: Contestant, amt: int) -> None:
-        self._log(f"{t.name} healed {amt}. Health: {t.health}")
+        self._log(f"{t.name} healed {amt}. Health: {t.health}", False)
 
     def dmg(self, t: Contestant, amt: int) -> None:
         if amt != 0:
-            self._log(f"{t.name} took {amt} damage")
+            self._log(f"{t.name} took {amt} damage", False)
 
     def won(self, t: Contestant) -> None:
         self._log(f"{t.name} won!")
@@ -46,4 +48,4 @@ class Logger:
         self._log("No one won.")
 
     def chose(self, t, message) -> None:
-        self._log(f"{t.name} chose to {message}")
+        self._log(f"{t.name} chose to {message}", False)

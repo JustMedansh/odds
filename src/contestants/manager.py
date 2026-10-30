@@ -20,7 +20,9 @@ def load_contestants(filename: str) -> list[Contestant]:
         Contestant(
             name=item["name"],
             gender=item["gender"],
-            skills=item["skills"],
+            strength=item["skills"]['strength'],
+            intelligence=item["skills"]['intelligence'],
+            social=item["skills"]['social']
         )
         for item in data
     ]

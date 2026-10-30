@@ -1,19 +1,20 @@
+from dataclasses import dataclass
 import random
 from src.logger import Logger
 
-SKILLS = {
-    'strength': 0,
-    'intelligence': 0,
-    'social': 0,
-}
+@dataclass
+class Personality:
+    strength: int
+    intelligence: int
+    social: int
 
 class Contestant:
-    def __init__(self, name: str, gender: str, skills=None):
+    def __init__(self, name: str, gender: str, strength: int, intelligence: int, social: int):
         self.name = name
         self.gender = gender
         self.health = 100
         self.alive = True
-        self.skills = skills.copy() if skills is not None else SKILLS.copy()
+        self.skills = Personality(strength=strength, intelligence=intelligence, social=social)
         self.logger = Logger()
 
         self.armor = 0
@@ -111,13 +112,7 @@ def random_contestant(count: int) -> list[Contestant]:
             name = FEMALE_NAMES[-1]
             FEMALE_NAMES.pop()
 
-        skills = {
-            skill: random.randint(1, 10) for skill in SKILLS
-        }
-
-        tributes.append(Contestant(name, gender, skills))
+        skills = [random.randint(1, 10) for _ in range(3)]
+        tributes.append(Contestant(name, gender, skills[0], skills[1], skills[2]))
 
     return tributes
-
-def get_skills():
-    return SKILLS

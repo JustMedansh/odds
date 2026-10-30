@@ -16,8 +16,8 @@ class Event:
             if stat == "random":
                 continue
 
-            if stat in contestant.skills:
-                value = contestant.skills[stat]
+            if hasattr(contestant.skills, stat):
+                value = getattr(contestant.skills, stat)
             else:
                 value = getattr(contestant, stat)
 

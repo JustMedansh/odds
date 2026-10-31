@@ -1,13 +1,18 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from .event import Event
 from random import choices, randint
-from src.contestants.contestant import Contestant
-from src.contestants.grouped_contestant import GroupedContestants
-from src.logger import Logger
+
+if TYPE_CHECKING:
+    from src.contestants.contestant import Contestant
+    from src.contestants.grouped_contestant import GroupedContestants
 
 class FindItems(Event):
     def search(self) -> Contestant:
         """Simulate an item search"""
-        game: GroupedContestants = self.game
+        game: GroupedContestants = self.gc
         contestant: Contestant = game.random_contestant()
 
         LOOT_TABLE = {

@@ -1,8 +1,15 @@
+from __future__ import annotations
+
 import random
+from typing import TYPE_CHECKING
+
 from .event import Event
-from src.contestants.contestant import Contestant
-from src.contestants.grouped_contestant import GroupedContestants
-from src.logger import Logger
+from src.contestants.contestant import Action
+
+if TYPE_CHECKING:
+    from src.contestants.contestant import Contestant
+    from src.core.game import Game
+    from src.logger import Logger
 
 # each contestant is sent the opponent
 # they can choose to FLEE, ATTACK, DEFEND, DODGE, NOTHING
@@ -18,9 +25,9 @@ class Fight(Event):
             c.health_multiplier = 1
 
     def fight(self, c1: Contestant, c2: Contestant) -> tuple[Contestant, Contestant]:
-        """Stage a fight between two random contestants"""
+        """Stage a fight between two random contestants. Third return is True if fight was resolved."""
         logger: Logger = self.logger
-        # game: GroupedContestants = self.game
+        game: Game = self.game
 
         contestant_a, contestant_b = c1, c2
         logger.fighting(contestant_a, contestant_b)
@@ -28,7 +35,9 @@ class Fight(Event):
         while True:
             self.reset_multipliers(contestant_a, contestant_b)
             if self.resolve_turn(contestant_a, contestant_b):
-                return contestant_a, contestant_b
+                return contestant_a, contestant_b, True
+        return contestant_a, contestant_b, False
+
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:
         """Resolve a single turn between two contestants"""
@@ -40,10 +49,10 @@ class Fight(Event):
         }
 
         fight_dispatcher = {
-            'FLEE': self.flee_handler,
-            'ATTACK': self.attack_handler,
-            'DEFEND': self.defend_handler,
-            'DODGE': self.dodge_handler
+            Action.Fight.FLEE: self.flee_handler,
+            Action.Fight.ATTACK: self.attack_handler,
+            Action.Fight.DEFEND: self.defend_handler,
+            Action.Fight.DODGE: self.dodge_handler,
         }
 
         choice_a = contestant_a.make_decision_fight(contestant_b)
@@ -52,8 +61,8 @@ class Fight(Event):
         result_a = fight_dispatcher[choice_a](contestant_a)
         result_b = fight_dispatcher[choice_b](contestant_b)
 
-        resolve_hit_a = (choice_a == 'ATTACK')
-        resolve_hit_b = (choice_b == 'ATTACK')
+        resolve_hit_a = choice_a == Action.Fight.ATTACK
+        resolve_hit_b = choice_b == Action.Fight.ATTACK
 
         if not result_a or not result_b:
             return contestant_a, contestant_b

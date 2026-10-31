@@ -1,12 +1,19 @@
+from __future__ import annotations
+
 import random
-from src.contestants.contestant import Contestant
-from src.logger import Logger
-from src.contestants.grouped_contestant import GroupedContestants
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.contestants.contestant import Contestant
+    from src.contestants.grouped_contestant import GroupedContestants
+    from src.core.game import Game
+    from src.logger import Logger
 
 class Event:
-    def __init__(self, game: GroupedContestants):
-        self.game = game
+    def __init__(self, gc: GroupedContestants, game: Game):
+        self.gc = gc
         self.logger: Logger = game.logger
+        self.game = game
 
     @staticmethod
     def get_power(contestant: Contestant, weights: dict[str, int]):

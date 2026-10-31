@@ -1,6 +1,10 @@
-from src.logger import Logger
-from src.contestants.contestant import Contestant
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
 import random
+
+if TYPE_CHECKING:
+    from src.contestants.contestant import Contestant
 
 class GroupedContestants:
     def __init__(self, logger):

@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from contestants.contestant import Contestant
+    from src.contestants.contestant import Contestant
 
 class Logger:
     def __init__(self, debug: bool = True):
         self.debug = debug
-        self.print_important = True
+        self.print_important = False
 
     def _log(self, message: str, important: bool = True) -> None:
         if self.debug:

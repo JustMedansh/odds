@@ -24,19 +24,15 @@ class Fight(Event):
             c.damage_multiplier = 1
             c.health_multiplier = 1
 
-    def fight(self, c1: Contestant, c2: Contestant) -> tuple[Contestant, Contestant]:
+    def fight(self, c1: Contestant, c2: Contestant, t: int = 0) -> tuple[Contestant, Contestant]:
         """Stage a fight between two random contestants. Third return is True if fight was resolved."""
-        logger: Logger = self.logger
-        game: Game = self.game
-
         contestant_a, contestant_b = c1, c2
-        logger.fighting(contestant_a, contestant_b)
 
-        while True:
+        if t % 2 == 0:
             self.reset_multipliers(contestant_a, contestant_b)
             if self.resolve_turn(contestant_a, contestant_b):
-                return contestant_a, contestant_b, True
-        return contestant_a, contestant_b, False
+                return contestant_a, contestant_b, t, True
+        return contestant_a, contestant_b, t, False
 
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:

@@ -43,6 +43,14 @@ class GroupedContestants:
             if contestant.alive
         ]
 
+    def get_available_contestants(self) -> list[Contestant]:
+        """Return a list of not-fighting alive contestants"""
+        return [
+            contestant
+            for contestant in self.get_alive_contestants()
+            if not contestant.fighting
+        ]
+
     def get_dead_contestants(self) -> list[Contestant]:
         """Return a list of dead contestants"""
         return [
@@ -53,12 +61,12 @@ class GroupedContestants:
 
     def random_contestant(self) -> Contestant:
         """Return a random contestant from alive contestants."""
-        return random.choice(self.get_alive_contestants())
+        return random.choice(self.get_available_contestants())
 
     def random_group(self, number_of_contestants: int) -> list[Contestant]:
         """Return a random group of contestants from alive contestants."""
         return random.sample(
-            self.get_alive_contestants(),
+            self.get_available_contestants(),
             k=number_of_contestants
         )
 

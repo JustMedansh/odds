@@ -49,6 +49,8 @@ class Contestant:
         self.damage_multiplier = 1
         self.health_multiplier = 1
 
+        self.fighting = False
+
     def __str__(self):
         attrs = []
         for name, value in self.__dict__.items():

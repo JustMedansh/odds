@@ -14,6 +14,8 @@ class FindItems(Event):
         """Simulate an item search"""
         game: GroupedContestants = self.gc
         contestant: Contestant = game.random_contestant()
+        if not contestant:
+            return
 
         LOOT_TABLE = {
             "NOTHING": {

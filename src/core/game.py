@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+import time
 from typing import TYPE_CHECKING
 
 from src.contestants.manager import load_contestants
@@ -23,15 +23,16 @@ class Game:
 
     def maintain_fighting(self, fight_result=None):
         if fight_result is not None:
-            c1, c2, resolved = fight_result
-            fighters = (c1, c2)
+            c1, c2, t, resolved = fight_result
+            fighters = (c1, c2, t)
             fighters_in_list = fighters in self.fighting
+            if fighters_in_list:
+                self.fighting.remove(fighters)
+
             if not resolved:
                 if not fighters_in_list:
-                    self.fighting.append(fighters) 
-            else:
-                if fighters_in_list:
-                    self.fighting.remove(fighters)
+                    self.logger.fighting(c1, c2)
+                self.fighting.append((c1, c2, t + 1))
 
     def setup(self) -> None:
         """Initialize contestants and game events."""
@@ -45,13 +46,13 @@ class Game:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
             if len(self.fighting) == 0:
-                self.fighting.append(tuple(self.gc.random_group(2)))
+                c1, c2 = self.gc.random_group(2)
+                self.maintain_fighting((c1, c2, 0, False))
                 
             self.search.search()
-            self.maintain_fighting()
 
-            for c1, c2 in self.fighting.copy():
-                result = self.fight.fight(c1, c2)
+            for c1, c2, t in self.fighting.copy():
+                result = self.fight.fight(c1, c2, t)
                 self.maintain_fighting(result)
 
             self.fights += 1

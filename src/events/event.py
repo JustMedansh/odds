@@ -16,8 +16,8 @@ class Event:
             if stat == "random":
                 continue
 
-            if hasattr(contestant.skills, stat):
-                value = getattr(contestant.skills, stat)
+            if hasattr(contestant.personality, stat):
+                value = getattr(contestant.personality, stat)
             else:
                 value = getattr(contestant, stat)
 

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import random
 from src.logger import Logger
 
@@ -7,6 +7,15 @@ class Personality:
     strength: int
     intelligence: int
     social: int
+    perception: int = field(init=False)
+    agility: int = field(init=False)
+    survivability: int = field(init=False)
+
+
+    def __post_init__(self):
+        self.perception = int((self.intelligence * 0.8) + (self.social * 0.2))
+        self.agility = int((self.intelligence * 0.6) + (self.strength * 0.4))
+        self.survivability = int(((self.intelligence + self.strength)) * 0.2)
 
 class Contestant:
     def __init__(self, name: str, gender: str, strength: int, intelligence: int, social: int):
@@ -14,7 +23,7 @@ class Contestant:
         self.gender = gender
         self.health = 100
         self.alive = True
-        self.skills = Personality(strength=strength, intelligence=intelligence, social=social)
+        self.personality = Personality(strength=strength, intelligence=intelligence, social=social)
         self.logger = Logger()
 
         self.armor = 0

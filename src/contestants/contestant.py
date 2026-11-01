@@ -5,7 +5,7 @@ from enum import Enum, auto
 import random
 from src.logger import Logger
 
-class Action:
+class ActionChoice:
     class World(Enum):
         LOOT = auto()
         FIGHT = auto()
@@ -85,17 +85,17 @@ class Contestant:
         self.health = min(100, self.health + amt)
         self.logger.heal(self, amt)
 
-    def make_decision_fight(self, opponent: Contestant) -> Action.Fight:
+    def make_decision_fight(self, opponent: Contestant) -> ActionChoice.Fight:
         # FLEE: 30% chance of failing, but the fight ends. Else, full damage to contestant and third of original damage to opponent
         # ATTACK: Proceed wiht normal attack
         # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
         # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
         chose = random.choice((
-            Action.Fight.ATTACK,
-            Action.Fight.FLEE,
-            Action.Fight.DEFEND,
-            Action.Fight.DODGE,
+            ActionChoice.Fight.ATTACK,
+            ActionChoice.Fight.FLEE,
+            ActionChoice.Fight.DEFEND,
+            ActionChoice.Fight.DODGE,
         )) # temporary
         self.logger.chose(self, chose.name)
         return chose

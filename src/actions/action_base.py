@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from src.core.game import Game
     from src.logger import Logger
 
-class Event:
+class ActionBase:
     def __init__(self, gc: GroupedContestants, game: Game):
         self.gc = gc
         self.logger: Logger = game.logger

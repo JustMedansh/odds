@@ -3,8 +3,8 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-from .event import Event
-from src.contestants.contestant import Action
+from .action_base import ActionBase
+from src.contestants.contestant import ActionChoice
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
 # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-class Fight(Event):
+class Fight(ActionBase):
     def reset_multipliers(self, *contestants: Contestant):
         for c in contestants:
             c.damage_multiplier = 1
@@ -45,10 +45,10 @@ class Fight(Event):
         }
 
         fight_dispatcher = {
-            Action.Fight.FLEE: self.flee_handler,
-            Action.Fight.ATTACK: self.attack_handler,
-            Action.Fight.DEFEND: self.defend_handler,
-            Action.Fight.DODGE: self.dodge_handler,
+            ActionChoice.Fight.FLEE: self.flee_handler,
+            ActionChoice.Fight.ATTACK: self.attack_handler,
+            ActionChoice.Fight.DEFEND: self.defend_handler,
+            ActionChoice.Fight.DODGE: self.dodge_handler,
         }
 
         choice_a = contestant_a.make_decision_fight(contestant_b)
@@ -57,8 +57,8 @@ class Fight(Event):
         result_a = fight_dispatcher[choice_a](contestant_a)
         result_b = fight_dispatcher[choice_b](contestant_b)
 
-        resolve_hit_a = choice_a == Action.Fight.ATTACK
-        resolve_hit_b = choice_b == Action.Fight.ATTACK
+        resolve_hit_a = choice_a == ActionChoice.Fight.ATTACK
+        resolve_hit_b = choice_b == ActionChoice.Fight.ATTACK
 
         if not result_a or not result_b:
             return contestant_a, contestant_b

@@ -1,10 +1,9 @@
 from __future__ import annotations
-import time
 from typing import TYPE_CHECKING
 
 from src.contestants.manager import load_contestants
 from src.contestants.grouped_contestant import GroupedContestants
-from src.events import Fight, FindItems
+from src.actions import Fight, FindItems
 from src.logger import Logger
 
 if TYPE_CHECKING:

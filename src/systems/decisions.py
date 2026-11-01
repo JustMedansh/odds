@@ -8,9 +8,9 @@ if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
 
 
-def make_decision_world(contestant: Contestant, choices: list[ActionChoice.World] | None = None,) -> ActionChoice.World:
+def make_decision_world(contestant: Contestant, choices: list[ActionChoice.Base] | None = None,) -> ActionChoice.Base:
     if choices is None:
-        choices = [ActionChoice.World.LOOT, ActionChoice.World.FIGHT, ActionChoice.World.REST]
+        choices = [ActionChoice.Base.LOOT, ActionChoice.Base.FIGHT, ActionChoice.Base.REST]
 
     health_fraction = contestant.health / 100
     weapon_fraction = min(contestant.weapon / 20, 1)
@@ -21,9 +21,9 @@ def make_decision_world(contestant: Contestant, choices: list[ActionChoice.World
     readiness = max(gear, strength_fraction)
 
     utilities = {
-        ActionChoice.World.LOOT: 1 - gear,
-        ActionChoice.World.FIGHT: health_fraction * readiness,
-        ActionChoice.World.REST: 1 - health_fraction,
+        ActionChoice.Base.LOOT: 1 - gear,
+        ActionChoice.Base.FIGHT: health_fraction * readiness,
+        ActionChoice.Base.REST: 1 - health_fraction,
     }
 
     weights = [utilities[action] for action in choices]
@@ -31,4 +31,5 @@ def make_decision_world(contestant: Contestant, choices: list[ActionChoice.World
     if not any(weights):
         return random.choice(choices)
 
-    return random.choices(choices, weights, k=1)[0]
+    # return random.choices(choices, weights, k=1)[0]
+    return random.choice([ActionChoice.Base.FIGHT, ActionChoice.Base.LOOT])

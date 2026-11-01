@@ -19,20 +19,27 @@ if TYPE_CHECKING:
 # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
 class Fight(ActionBase):
+    def __init__(self, gc, game, c: list[Contestant]):
+        super().__init__(gc, game)
+        self.contestants = c
+        self.elapsed_time = 0
+
     def reset_multipliers(self, *contestants: Contestant):
         for c in contestants:
             c.damage_multiplier = 1
             c.health_multiplier = 1
 
-    def fight(self, c1: Contestant, c2: Contestant, t: int = 0) -> tuple[Contestant, Contestant]:
-        """Stage a fight between two random contestants. Third return is True if fight was resolved."""
-        contestant_a, contestant_b = c1, c2
+    def update(self) -> bool:
+        """Advance this fight by one game tick; return whether it is resolved."""
+        contestant_a, contestant_b = self.contestants
 
-        if t % 4 == 0:
+        if self.elapsed_time % 4 == 0:
             self.reset_multipliers(contestant_a, contestant_b)
             if self.resolve_turn(contestant_a, contestant_b):
-                return (contestant_a, contestant_b), t, True
-        return (contestant_a, contestant_b), t, False
+                return True
+
+        self.elapsed_time += 1
+        return False
 
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:

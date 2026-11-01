@@ -32,3 +32,6 @@ class ActionBase:
 
         power += random.randint(-weights['random'], weights['random'])
         return power
+
+    # def update(self):
+        # raise NotImplementedError

@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
+from time import sleep
 from src.contestants.manager import load_contestants
 from src.contestants.grouped_contestant import GroupedContestants
-from src.actions import Fight, FindItems
+from src.actions import Fight, Scavenge
 from src.logger import Logger
 from src.contestants.contestant import ActionChoice
 
@@ -21,51 +21,52 @@ class Game:
         # Initialize the game
         self.setup()
 
-    def maintain_events(self, event_result: tuple, event_type: ActionChoice):
-        if event_result is not None:
-            c, t, resolved = event_result
-            event = (*c, t, event_type)
-            event_in_list = event in self.events
+    def event_initializer(self, event: ActionChoice.Base, contestants: tuple[Contestant]):
+        event_dispatcher = {
+            ActionChoice.Base.FIGHT: Fight,
+            ActionChoice.Base.LOOT: Scavenge,
+        }
 
-            if event_in_list:
+        event_class = event_dispatcher[event]
+        active_event = event_class(self.gc, self, list(contestants))
+        self.events.append(active_event)
+
+        for contestant in contestants:
+            contestant.busy = True
+
+        if event == ActionChoice.Base.FIGHT:
+            self.logger.fighting(*contestants)
+
+    def maintain_events(self):
+        for event in self.events.copy():
+            if event.update():
                 self.events.remove(event)
-
-            if resolved:
-                for contestant in c:
+                for contestant in event.contestants:
                     contestant.busy = False
-
-            if not resolved:
-                if not event_in_list:
-                    for contestant in c:
-                        contestant.busy = True
-                    if event_type == ActionChoice.Fight:
-                        self.logger.fighting(*c)
-                self.events.append((*c, t + 1, event_type))
 
     def setup(self) -> None:
         """Initialize contestants and game events."""
         contestants = load_contestants("c.json")
         self.gc.add_contestants(contestants)
 
-        self.fight = Fight(self.gc, self)
-        self.search = FindItems(self.gc, self)
-
     def run(self) -> tuple[Game, int]:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
-            if len(self.events) == 0:
-                try:
-                    c1, c2 = self.gc.random_group(2)
-                except IndexError:
-                    pass
-                self.maintain_events(((c1, c2), 0, False), ActionChoice.Fight)
-                
-            self.search.search()
+            self.maintain_events()
 
-            for c1, c2, t, state in self.events.copy():
-                if state == ActionChoice.Fight:
-                    result = self.fight.fight(c1, c2, t)
-                    self.maintain_events(result, ActionChoice.Fight)
+            if self.gc.count_alive() <= 1:
+                break
+
+            available = self.gc.get_available_contestants()
+            has_fight = any(isinstance(event, Fight) for event in self.events)
+            if not has_fight and len(available) >= 2:
+                c1, c2 = self.gc.random_group(2)
+                self.event_initializer(ActionChoice.Base.FIGHT, (c1, c2))
+
+            available = self.gc.get_available_contestants()
+            if available and False:
+                contestant = self.gc.random_contestant()
+                self.event_initializer(ActionChoice.Base.LOOT, (contestant,))
 
             self.fights += 1
             self.time += 1

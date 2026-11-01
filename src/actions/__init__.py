@@ -1,2 +1,2 @@
 from .fight import Fight
-from .search import FindItems
+from .scavenge import Scavenge

@@ -8,18 +8,25 @@ from random import choices, randint
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
     from src.contestants.grouped_contestant import GroupedContestants
+    from src.core.game import Game
 
-class FindItems(ActionBase):
-    def search(self) -> Contestant:
-        """Simulate an item search"""
-        game: GroupedContestants = self.gc
-        try:
-            contestant: Contestant = game.random_contestant()
-        except:
-            return
-        
-        if not contestant:
-            return
+class Scavenge(ActionBase):
+    def __init__(self, gc: GroupedContestants, game: Game, contestants: list[Contestant]):
+        super().__init__(gc, game)
+        self.contestants = contestants
+        self.elapsed_time = 0
+
+    def update(self) -> bool:
+        """Advance scavenging one tick; resolve the search after four ticks."""
+        self.elapsed_time += 1
+        if self.elapsed_time < 4:
+            return False
+
+        self.search(self.contestants[0])
+        return True
+
+    def search(self, contestant: Contestant) -> Contestant:
+        """Resolve an item search for this event's contestant."""
 
         LOOT_TABLE = {
             "NOTHING": {

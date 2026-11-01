@@ -7,7 +7,7 @@ from src.logger import Logger
 from src.systems.decisions import make_decision_world
 
 class ActionChoice:
-    class World(Enum):
+    class Base(Enum):
         LOOT = auto()
         FIGHT = auto()
         REST = auto()
@@ -95,7 +95,6 @@ class Contestant:
 
         # chose = random.choice((
         #     ActionChoice.Fight.ATTACK,
-        #     ActionChoice.Fight.FLEE,
         #     ActionChoice.Fight.DEFEND,
         #     ActionChoice.Fight.DODGE,
         # )) # temporary

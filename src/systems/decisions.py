@@ -1,19 +1,34 @@
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 
-from src.contestants.contestant import ActionChoice
-
 if TYPE_CHECKING:
+    from src.contestants.contestant import ActionChoice
     from src.contestants.contestant import Contestant
-    from src.core.game import Game
 
-def decide_world(contestant: Contestant, game: Game, choices: list[ActionChoice.World]) -> ActionChoice.World:
+
+def make_decision_world(contestant: Contestant, choices: list[ActionChoice.World] | None = None,) -> ActionChoice.World:
+    if choices is None:
+        choices = [ActionChoice.World.LOOT, ActionChoice.World.FIGHT, ActionChoice.World.REST]
+
     health_fraction = contestant.health / 100
+    weapon_fraction = min(contestant.weapon / 20, 1)
+    armor_fraction = min(contestant.armor / 20, 1)
+    strength_fraction = contestant.personality.strength / 10
+
+    gear = (weapon_fraction + armor_fraction) / 2
+    readiness = max(gear, strength_fraction)
 
     utilities = {
-        ActionChoice.World.LOOT: 1 - health_fraction,
-        ActionChoice.World.FIGHT: health_fraction,
+        ActionChoice.World.LOOT: 1 - gear,
+        ActionChoice.World.FIGHT: health_fraction * readiness,
+        ActionChoice.World.REST: 1 - health_fraction,
     }
 
-    return max(choices, key=utilities.__getitem__)
+    weights = [utilities[action] for action in choices]
+
+    if not any(weights):
+        return random.choice(choices)
+
+    return random.choices(choices, weights, k=1)[0]

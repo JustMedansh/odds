@@ -4,11 +4,13 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 import random
 from src.logger import Logger
+from src.systems.decisions import make_decision_world
 
 class ActionChoice:
     class World(Enum):
         LOOT = auto()
         FIGHT = auto()
+        REST = auto()
 
     class Fight(Enum):
         ATTACK = auto()
@@ -101,6 +103,8 @@ class Contestant:
         self.logger.chose(self, chose.name)
         return chose
 
+    def make_decision_world(self) -> ActionChoice.Fight:
+        make_decision_world(self)
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

@@ -17,6 +17,7 @@ class FindItems(ActionBase):
             contestant: Contestant = game.random_contestant()
         except:
             return
+        
         if not contestant:
             return
 

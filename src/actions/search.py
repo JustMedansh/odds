@@ -13,7 +13,10 @@ class FindItems(ActionBase):
     def search(self) -> Contestant:
         """Simulate an item search"""
         game: GroupedContestants = self.gc
-        contestant: Contestant = game.random_contestant()
+        try:
+            contestant: Contestant = game.random_contestant()
+        except:
+            return
         if not contestant:
             return
 

@@ -48,7 +48,7 @@ class GroupedContestants:
         return [
             contestant
             for contestant in self.get_alive_contestants()
-            if not contestant.fighting
+            if not contestant.busy
         ]
 
     def get_dead_contestants(self) -> list[Contestant]:

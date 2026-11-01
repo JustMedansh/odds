@@ -28,11 +28,11 @@ class Fight(ActionBase):
         """Stage a fight between two random contestants. Third return is True if fight was resolved."""
         contestant_a, contestant_b = c1, c2
 
-        if t % 2 == 0:
+        if t % 4 == 0:
             self.reset_multipliers(contestant_a, contestant_b)
             if self.resolve_turn(contestant_a, contestant_b):
-                return contestant_a, contestant_b, t, True
-        return contestant_a, contestant_b, t, False
+                return (contestant_a, contestant_b), t, True
+        return (contestant_a, contestant_b), t, False
 
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:

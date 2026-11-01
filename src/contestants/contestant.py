@@ -49,7 +49,7 @@ class Contestant:
         self.damage_multiplier = 1
         self.health_multiplier = 1
 
-        self.fighting = False
+        self.busy = False
 
     def __str__(self):
         attrs = []
@@ -91,12 +91,13 @@ class Contestant:
         # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
         # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-        chose = random.choice((
-            ActionChoice.Fight.ATTACK,
-            ActionChoice.Fight.FLEE,
-            ActionChoice.Fight.DEFEND,
-            ActionChoice.Fight.DODGE,
-        )) # temporary
+        # chose = random.choice((
+        #     ActionChoice.Fight.ATTACK,
+        #     ActionChoice.Fight.FLEE,
+        #     ActionChoice.Fight.DEFEND,
+        #     ActionChoice.Fight.DODGE,
+        # )) # temporary
+        chose = ActionChoice.Fight.ATTACK
         self.logger.chose(self, chose.name)
         return chose
 

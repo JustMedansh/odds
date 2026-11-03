@@ -1,11 +1,12 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from time import sleep
+import random
 from src.contestants.manager import load_contestants
 from src.contestants.grouped_contestant import GroupedContestants
 from src.actions import Fight, Scavenge
+from src.actions.choices import ActionChoice
 from src.logger import Logger
-from src.contestants.contestant import ActionChoice
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
@@ -17,6 +18,8 @@ class Game:
         self.logger = Logger(logger_state)
         self.gc = GroupedContestants(self.logger)
         self.time = 0
+
+        self.fighters = []
 
         # Initialize the game
         self.setup()
@@ -57,21 +60,40 @@ class Game:
             if self.gc.count_alive() <= 1:
                 break
 
-            available = self.gc.get_available_contestants()
-            has_fight = any(isinstance(event, Fight) for event in self.events)
-            if not has_fight and len(available) >= 2:
-                c1, c2 = self.gc.random_group(2)
-                self.event_initializer(ActionChoice.Base.FIGHT, (c1, c2))
+            # has_fight = any(isinstance(event, Fight) for event in self.events)
+            # if not has_fight and len(available) >= 2:
+            #     c1, c2 = self.gc.random_group(2)
+            #     self.event_initializer(ActionChoice.Base.FIGHT, (c1, c2))
 
-            available = self.gc.get_available_contestants()
-            if available and False:
-                contestant = self.gc.random_contestant()
-                self.event_initializer(ActionChoice.Base.LOOT, (contestant,))
+            # available = self.gc.get_available_contestants()
+            # if available and False:
+            #     contestant = self.gc.random_contestant()
+            #     self.event_initializer(ActionChoice.Base.LOOT, (contestant,))
 
-            self.fights += 1
+            # self.fights += 1
+
+            decisions = self.get_decisions()
+            self.fighters = [contestant for contestant, action in decisions.items() if action == ActionChoice.Base.FIGHT]
+            self.assign_fighters()
+
             self.time += 1
 
         return self.gc, self.fights, self.get_winner()
+
+    def assign_fighters(self):
+        for _ in range(len(self.fighters) // 2):
+            random.shuffle(self.fighters)
+            fighter_a = self.fighters.pop()
+            fighter_b = self.fighters.pop()
+
+            self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
+
+    def get_decisions(self) -> list[ActionChoice.Base]:
+        decisions = {}
+        for c in self.gc.get_available_contestants():
+            decisions[c] = c.get_decision_world()
+
+        return decisions
 
     def get_winner(self) -> Contestant | None:
         """Determine and return the winner, if any."""

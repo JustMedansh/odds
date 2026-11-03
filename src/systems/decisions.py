@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import random
 from typing import TYPE_CHECKING
+from src.actions.choices import ActionChoice
 
 if TYPE_CHECKING:
-    from src.contestants.contestant import ActionChoice
     from src.contestants.contestant import Contestant
 
 
@@ -31,5 +31,5 @@ def make_decision_world(contestant: Contestant, choices: list[ActionChoice.Base]
     if not any(weights):
         return random.choice(choices)
 
-    # return random.choices(choices, weights, k=1)[0]
+    return random.choices(choices, weights, k=1)[0]
     return random.choice([ActionChoice.Base.FIGHT, ActionChoice.Base.LOOT])

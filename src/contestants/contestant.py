@@ -1,22 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum, auto
 import random
 from src.logger import Logger
 from src.systems.decisions import make_decision_world
-
-class ActionChoice:
-    class Base(Enum):
-        LOOT = auto()
-        FIGHT = auto()
-        REST = auto()
-
-    class Fight(Enum):
-        ATTACK = auto()
-        DEFEND = auto()
-        DODGE = auto()
-        FLEE = auto()
+from src.actions.choices import ActionChoice
 
 @dataclass
 class Personality:
@@ -102,8 +90,8 @@ class Contestant:
         self.logger.chose(self, chose.name)
         return chose
 
-    def make_decision_world(self) -> ActionChoice.Fight:
-        make_decision_world(self)
+    def get_decision_world(self) -> ActionChoice.Base:
+        return make_decision_world(self)
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

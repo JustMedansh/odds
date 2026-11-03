@@ -4,7 +4,7 @@ import random
 from typing import TYPE_CHECKING
 
 from .action_base import ActionBase
-from src.contestants.contestant import ActionChoice
+from .choices import ActionChoice
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant

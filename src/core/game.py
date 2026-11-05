@@ -7,6 +7,7 @@ from src.contestants.grouped_contestant import GroupedContestants
 from src.actions import Fight, Scavenge
 from src.actions.choices import ActionChoice
 from src.logger import Logger
+from copy import copy
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
@@ -19,7 +20,6 @@ class Game:
         self.gc = GroupedContestants(self.logger)
         self.time = 0
 
-        self.fighters = []
 
         # Initialize the game
         self.setup()
@@ -60,40 +60,43 @@ class Game:
             if self.gc.count_alive() <= 1:
                 break
 
-            # has_fight = any(isinstance(event, Fight) for event in self.events)
-            # if not has_fight and len(available) >= 2:
-            #     c1, c2 = self.gc.random_group(2)
-            #     self.event_initializer(ActionChoice.Base.FIGHT, (c1, c2))
-
-            # available = self.gc.get_available_contestants()
-            # if available and False:
-            #     contestant = self.gc.random_contestant()
-            #     self.event_initializer(ActionChoice.Base.LOOT, (contestant,))
-
-            # self.fights += 1
-
             decisions = self.get_decisions()
-            self.fighters = [contestant for contestant, action in decisions.items() if action == ActionChoice.Base.FIGHT]
-            self.assign_fighters()
+            self.assign_fighters(decisions[ActionChoice.Base.FIGHT])
+            self.assign_looters(decisions[ActionChoice.Base.LOOT])
 
             self.time += 1
 
         return self.gc, self.fights, self.get_winner()
 
-    def assign_fighters(self):
-        for _ in range(len(self.fighters) // 2):
-            random.shuffle(self.fighters)
-            fighter_a = self.fighters.pop()
-            fighter_b = self.fighters.pop()
+    def assign_fighters(self, fighters_orig):
+        fighters = copy(fighters_orig)
+        for _ in range(len(fighters) // 2):
+            random.shuffle(fighters)
+            fighter_a = fighters.pop()
+            fighter_b = fighters.pop()
 
             self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
+
+    def assign_looters(self, looters_orig):
+        looters =  copy(looters_orig)
+        for _ in range(len(looters)):
+            random.shuffle(looters)
+            looter = looters.pop()
+    
+            self.event_initializer(ActionChoice.Base.LOOT, (looter,))
 
     def get_decisions(self) -> list[ActionChoice.Base]:
         decisions = {}
         for c in self.gc.get_available_contestants():
             decisions[c] = c.get_decision_world()
 
-        return decisions
+        # return decisions
+        grouped_decisions = {}
+
+        for action in ActionChoice.Base:
+            grouped_decisions[action] = [c for c, a in decisions.items() if a == action]
+
+        return grouped_decisions
 
     def get_winner(self) -> Contestant | None:
         """Determine and return the winner, if any."""

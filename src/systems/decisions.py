@@ -32,4 +32,4 @@ def make_decision_world(contestant: Contestant, choices: list[ActionChoice.Base]
         return random.choice(choices)
 
     return random.choices(choices, weights, k=1)[0]
-    return random.choice([ActionChoice.Base.FIGHT, ActionChoice.Base.LOOT])
+    # return random.choice([ActionChoice.Base.FIGHT, ActionChoice.Base.LOOT])

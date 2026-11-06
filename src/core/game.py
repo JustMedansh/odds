@@ -6,17 +6,21 @@ from src.contestants.manager import load_contestants
 from src.contestants.grouped_contestant import GroupedContestants
 from src.actions import Fight, Scavenge
 from src.actions.choices import ActionChoice
-from src.logger import Logger
+from src.logger import Logger, LogLevel
 from copy import copy
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
 
 class Game:
-    def __init__(self, logger_state: bool = True):
+    def __init__(self, logger_state: bool | LogLevel = LogLevel.INFO):
         self.fights = 0
         self.events = []
-        self.logger = Logger(logger_state)
+        if isinstance(logger_state, bool):
+            logger_level = LogLevel.INFO if logger_state else LogLevel.QUIET
+        else:
+            logger_level = LogLevel(logger_state)
+        self.logger = Logger(logger_level)
         self.gc = GroupedContestants(self.logger)
         self.time = 0
 

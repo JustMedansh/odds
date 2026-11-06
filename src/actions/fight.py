@@ -151,7 +151,7 @@ class Fight(ActionBase):
         damage = max(0, damage)
 
         if damage != 0:
-            self.logger.hit(target, attacker)
+            self.logger.hit(target, attacker, damage)
         target.take_damage(damage)
 
         return False

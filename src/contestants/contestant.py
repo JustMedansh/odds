@@ -28,6 +28,7 @@ class Contestant:
         self.health = 100
         self.alive = True
         self.personality = Personality(strength=strength, intelligence=intelligence, social=social)
+        # Replaced with the game's shared logger when added to its contestant group.
         self.logger = Logger()
 
         self.armor = 0

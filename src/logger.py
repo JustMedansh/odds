@@ -1,53 +1,63 @@
 from __future__ import annotations
 
+from enum import IntEnum
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
 
-class Logger:
-    def __init__(self, debug: bool = True):
-        self.debug = debug
-        self.print_important = False
 
-    def _log(self, message: str, important: bool = True) -> None:
-        if self.debug:
-            if not self.print_important or important:
-                print(message)
+class LogLevel(IntEnum):
+    QUIET = 0
+    IMPORTANT = 1
+    INFO = 2
+    DEBUG = 3
+
+
+class Logger:
+    """Print simulation events at or above the configured importance."""
+
+    def __init__(self, level: LogLevel = LogLevel.INFO):
+        self.level = LogLevel(level)
+
+    def _log(self, message: str, level: LogLevel = LogLevel.INFO) -> None:
+        if self.level >= level:
+            print(message)
 
     def death(self, t: Contestant) -> None:
-        self._log(f"{t.name} died")
+        self._log(f"{t.name} died.", LogLevel.IMPORTANT)
 
     def run_away(self, t: Contestant) -> None:
-        self._log(f"{t.name} ran away.")
+        self._log(f"{t.name} fled the fight.")
 
-    def hit(self, defender: Contestant, attacker: Contestant) -> None:
-        self._log(f"{defender.name} was hit by {attacker.name}.", False)
+    def hit(self, defender: Contestant, attacker: Contestant, amount: int) -> None:
+        self._log(f"{attacker.name} hit {defender.name} for {amount} damage.")
 
     def dmg_both(self, t1: Contestant, t2: Contestant) -> None:
         self._log(f"Both {t1.name} and {t2.name} took damage.")
 
     def fighting(self, t1: Contestant, t2: Contestant) -> None:
-        self._log(f"{t1.name} and {t2.name} are fighting.")
+        self._log(f"{t1.name} and {t2.name} started fighting.")
 
-    def found(self, t: Contestant, loot: str, units: int = None) -> None:
-        if units:
-            self._log(f"{t.name} found {loot} of {units} value.")
+    def found(self, t: Contestant, loot: str, units: int | None = None) -> None:
+        level = LogLevel.DEBUG if loot.lower() == "nothing" else LogLevel.INFO
+        if units is not None:
+            self._log(f"{t.name} found {loot} (value {units}).", level)
         else:
-            self._log(f"{t.name} found {loot}")
-        
+            self._log(f"{t.name} found {loot}.", level)
+
     def heal(self, t: Contestant, amt: int) -> None:
-        self._log(f"{t.name} healed {amt}. Health: {t.health}", False)
+        self._log(f"{t.name} healed {amt}. Health: {t.health}.", LogLevel.DEBUG)
 
     def dmg(self, t: Contestant, amt: int) -> None:
         if amt != 0:
-            self._log(f"{t.name} took {amt} damage", False)
+            self._log(f"{t.name} took {amt} damage. Health: {t.health}.", LogLevel.DEBUG)
 
     def won(self, t: Contestant) -> None:
-        self._log(f"{t.name} won!")
+        self._log(f"{t.name} won!", LogLevel.IMPORTANT)
 
     def no_win(self) -> None:
-        self._log("No one won.")
+        self._log("No one won.", LogLevel.IMPORTANT)
 
-    def chose(self, t, message) -> None:
-        self._log(f"{t.name} chose to {message}", False)
+    def chose(self, t: Contestant, message: str) -> None:
+        self._log(f"{t.name} chose to {message}.", LogLevel.DEBUG)

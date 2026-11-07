@@ -51,9 +51,9 @@ def adding_interface(filename: str) -> None:
         "name": input("Name: "),
         "gender": input("Gender (M/F): "),
         "skills": {
-            "strength": int(input("Strength (1-10): ")),
-            "intelligence": int(input("Intelligence (1-10): ")),
-            "social": int(input("Social (1-10): ")),
+            "strength": float(input("Strength (1-10): ")),
+            "intelligence": float(input("Intelligence (1-10): ")),
+            "social": float(input("Social (1-10): ")),
         },
     }
 

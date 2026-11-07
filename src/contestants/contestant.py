@@ -3,36 +3,37 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import random
 from src.logger import Logger
-from src.systems.decisions import make_decision_world
+from src.systems.decisions import make_decision_base, make_decision_fight
 from src.actions.choices import ActionChoice
 
 @dataclass
-class Personality:
-    strength: int
-    intelligence: int
-    social: int
-    perception: int = field(init=False)
-    agility: int = field(init=False)
-    survivability: int = field(init=False)
-
+class Stats:
+    strength: float
+    intelligence: float
+    social: float
+    perception: float = field(init=False)
+    agility: float = field(init=False)
+    survivability: float = field(init=False)
+    agility: float = field(init=False)
 
     def __post_init__(self):
-        self.perception = int((self.intelligence * 0.8) + (self.social * 0.2))
-        self.agility = int((self.intelligence * 0.6) + (self.strength * 0.4))
-        self.survivability = int(((self.intelligence + self.strength)) * 0.2)
+        self.perception = (self.intelligence * 0.8) + (self.social * 0.2)
+        self.agility = (self.intelligence * 0.6) + (self.strength * 0.4)
+        self.survivability = (self.intelligence + self.strength) * 0.2
+        self.agility = (self.intelligence * 0.7) + (self.strength * 0.3) 
 
 class Contestant:
-    def __init__(self, name: str, gender: str, strength: int, intelligence: int, social: int):
+    def __init__(self, name: str, gender: str, strength: float, intelligence: float, social: float):
         self.name = name
         self.gender = gender
         self.health = 100
         self.alive = True
-        self.personality = Personality(strength=strength, intelligence=intelligence, social=social)
+        self.personality = Stats(strength=strength, intelligence=intelligence, social=social)
         # Replaced with the game's shared logger when added to its contestant group.
         self.logger = Logger()
 
-        self.armor = 0
-        self.weapon = 0
+        self.armor: float = 0.0
+        self.weapon: float = 0.0
 
         self.allies = []
         self.enemies = []
@@ -76,23 +77,18 @@ class Contestant:
         self.health = min(100, self.health + amt)
         self.logger.heal(self, amt)
 
-    def make_decision_fight(self, opponent: Contestant) -> ActionChoice.Fight:
+    def get_decision_fight(self, opponent: Contestant) -> ActionChoice.Fight:
         # FLEE: 30% chance of failing, but the fight ends. Else, full damage to contestant and third of original damage to opponent
         # ATTACK: Proceed wiht normal attack
         # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
         # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-        # chose = random.choice((
-        #     ActionChoice.Fight.ATTACK,
-        #     ActionChoice.Fight.DEFEND,
-        #     ActionChoice.Fight.DODGE,
-        # )) # temporary
-        chose = ActionChoice.Fight.ATTACK
+        chose = make_decision_fight(self)
         self.logger.chose(self, chose.name)
         return chose
 
-    def get_decision_world(self) -> ActionChoice.Base:
-        return make_decision_world(self)
+    def get_decision_base(self) -> ActionChoice.Base:
+        return make_decision_base(self)
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

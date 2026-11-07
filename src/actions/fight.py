@@ -58,8 +58,8 @@ class Fight(ActionBase):
             ActionChoice.Fight.DODGE: self.dodge_handler,
         }
 
-        choice_a = contestant_a.make_decision_fight(contestant_b)
-        choice_b = contestant_b.make_decision_fight(contestant_a)
+        choice_a = contestant_a.get_decision_fight(contestant_b)
+        choice_b = contestant_b.get_decision_fight(contestant_a)
 
         result_a = fight_dispatcher[choice_a](contestant_a)
         result_b = fight_dispatcher[choice_b](contestant_b)

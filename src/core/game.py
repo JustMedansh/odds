@@ -38,6 +38,9 @@ class Game:
         active_event = event_class(self.gc, self, list(contestants))
         self.events.append(active_event)
 
+        if event == ActionChoice.Base.FIGHT:
+            self.fights += 1
+
         for contestant in contestants:
             contestant.busy = True
 
@@ -56,7 +59,7 @@ class Game:
         contestants = load_contestants("c.json")
         self.gc.add_contestants(contestants)
 
-    def run(self) -> tuple[Game, int]:
+    def run(self) -> tuple[GroupedContestants, int, Contestant | None]:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
             self.maintain_events()
@@ -92,7 +95,7 @@ class Game:
     def get_decisions(self) -> list[ActionChoice.Base]:
         decisions = {}
         for c in self.gc.get_available_contestants():
-            decisions[c] = c.get_decision_world()
+            decisions[c] = c.get_decision_base()
 
         # return decisions
         grouped_decisions = {}

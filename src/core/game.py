@@ -62,6 +62,7 @@ class Game:
     def run(self) -> tuple[GroupedContestants, int, Contestant | None]:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
+            sleep(0.1)
             self.maintain_events()
 
             if self.gc.count_alive() <= 1:

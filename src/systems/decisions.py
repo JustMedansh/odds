@@ -77,7 +77,7 @@ def make_decision_fight(contestant: Contestant, choices: list[ActionChoice.Fight
         ActionChoice.Fight.ATTACK: stats.readiness,
         ActionChoice.Fight.DEFEND: stats.armor_fraction, 
         ActionChoice.Fight.DODGE: stats.agility_fraction, 
-        ActionChoice.Fight.FLEE: 1 - stats.health_fraction  
+        ActionChoice.Fight.FLEE: (1 - stats.health_fraction) / 1.5
     }
 
     weights = [utilities[action] for action in choices]

@@ -2,6 +2,7 @@ import math
 from typing import TYPE_CHECKING, Any
 from dataclasses import dataclass
 from enum import Enum, auto
+import random
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
@@ -27,6 +28,8 @@ class WorldMap:
     def __init__(self, height, width):
         self.positions = {}
         self.tiles = self.generate_map(height, width)
+        self.height = height
+        self.width = width
 
     def __str__(self):
         lines = []
@@ -56,10 +59,10 @@ class WorldMap:
 
     # ---
 
-    def generate_map(self, height, width):
+    def generate_map(self, height: int, width: int):
         tiles = {}
-        for x in range(height):
-            for y in range(width):
+        for y in range(height):
+            for x in range(width):
                 tiles[(x, y)] = Tile(x, y, Terrain.GRASS)
 
         return tiles
@@ -68,4 +71,10 @@ class WorldMap:
         return (
             math.floor(pos.x),
             math.floor(pos.y)
+        )
+
+    def get_random_position(self):
+        return Position(
+            x = random.uniform(0, self.width),
+            y = random.uniform(0, self.height)
         )

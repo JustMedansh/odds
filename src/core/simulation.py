@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.visualization.map_renderer import run_renderer
 from src.core.game import Game
 from src.logger import LogLevel
 

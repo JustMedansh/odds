@@ -5,6 +5,7 @@ import random
 from src.logger import Logger
 from src.systems.decisions import make_decision_base, make_decision_fight
 from src.actions.choices import ActionChoice
+from src.core.map import Position, WorldMap
 
 @dataclass
 class Stats:
@@ -31,6 +32,7 @@ class Contestant:
         self.personality = Stats(strength=strength, intelligence=intelligence, social=social)
         # Replaced with the game's shared logger when added to its contestant group.
         self.logger = Logger()
+        self.position = Position(0, 0) # temp values
 
         self.armor: float = 0.0
         self.weapon: float = 0.0
@@ -52,6 +54,11 @@ class Contestant:
 
     def __repr__(self):
         return f"{self.name}: {self.health}"
+
+    def move_random_dir(self):
+        x = self.position.x + random.uniform(1, -1)
+        y = self.position.y + random.uniform(1, -1)
+        self.position = Position(x, y)
 
     def take_damage(self, dmg: int) -> bool:
         """Simulate taking damage"""

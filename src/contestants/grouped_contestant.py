@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from src.core.map import Position, WorldMap
 from typing import TYPE_CHECKING
 import random
 
@@ -14,10 +14,13 @@ class GroupedContestants:
         self.next_id = 1
         self.logger = logger
 
-    def add_contestants(self, contestants: list[Contestant]) -> None:
+    def add_contestants(self, contestants: list[Contestant], world_map: WorldMap) -> None:
         """Add a list of contestants"""
         for contestant in contestants:
+            random_coords = world_map.get_random_position()
             contestant.logger = self.logger
+            contestant.position = random_coords
+            world_map.update_position(contestant, random_coords)
             self.contestants[self.next_id] = contestant
             self.next_id += 1
 

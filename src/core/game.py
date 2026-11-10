@@ -7,6 +7,8 @@ from src.contestants.grouped_contestant import GroupedContestants
 from src.actions import Fight, Scavenge
 from src.actions.choices import ActionChoice
 from src.logger import Logger, LogLevel
+from src.core.map import Position, WorldMap
+from src.visualization.map_renderer import run_renderer, MapRenderer
 from copy import copy
 
 if TYPE_CHECKING:
@@ -23,7 +25,7 @@ class Game:
         self.logger = Logger(logger_level)
         self.gc = GroupedContestants(self.logger)
         self.time = 0
-
+        self.world_map = WorldMap(10, 10)
 
         # Initialize the game
         self.setup()
@@ -57,22 +59,30 @@ class Game:
     def setup(self) -> None:
         """Initialize contestants and game events."""
         contestants = load_contestants("c.json")
-        self.gc.add_contestants(contestants)
+        self.gc.add_contestants(contestants, self.world_map)
+        self.renderer = MapRenderer(self.world_map, tick_duration=0.1)
 
     def run(self) -> tuple[GroupedContestants, int, Contestant | None]:
         """Run the game until it ends."""
         while self.gc.count_alive() > 1:
-            sleep(0.1)
             self.maintain_events()
 
             if self.gc.count_alive() <= 1:
                 break
 
+            for c in self.gc.get_alive_contestants():
+                c.move_random_dir()
+                self.world_map.update_position(c, c.position)
+
             decisions = self.get_decisions()
             self.assign_fighters(decisions[ActionChoice.Base.FIGHT])
             self.assign_looters(decisions[ActionChoice.Base.LOOT])
 
+            if not self.renderer.update_renderer():
+                break
+
             self.time += 1
+            # run_renderer(self.world_map, 64)
 
         return self.gc, self.fights, self.get_winner()
 

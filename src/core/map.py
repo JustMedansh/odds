@@ -6,6 +6,7 @@ import random
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
+    from src.contestants.grouped_contestant import GroupedContestants
 
 @dataclass
 class Position:
@@ -78,3 +79,20 @@ class WorldMap:
             x = random.uniform(0, self.width),
             y = random.uniform(0, self.height)
         )
+
+    def get_distance(self, p1: Position, p2: Position):
+        """Get distance between two points"""
+        x1, y1 = p1.x, p1.y
+        x2, y2 = p2.x, p2.y
+
+        difference_x = (x1 - x2) ** 2
+        difference_y = (y1 - y2) ** 2
+        return math.sqrt(difference_x + difference_y)
+
+    def get_contestants_in_radius(self, c: Contestant, r: int, gc: GroupedContestants):
+        """Get all contestants in radius r"""
+        players_in_radius = [p for p in gc.get_alive_contestants() 
+                            if (self.get_distance(c.position, p.position) <= r)
+                            and (p != c)]
+        
+        return players_in_radius

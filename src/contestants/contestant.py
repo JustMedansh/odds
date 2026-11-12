@@ -46,18 +46,16 @@ class Contestant:
         self.busy = False
 
     def __str__(self):
-        attrs = []
-        for name, value in self.__dict__.items():
-            attrs.append(f"{name}: {value}")
-
-        return f"{"\n".join(attrs)}\n"
+        return self.name
 
     def __repr__(self):
         return f"{self.name}: {self.health}"
 
     def move_random_dir(self):
-        x = self.position.x + random.uniform(1, -1)
-        y = self.position.y + random.uniform(1, -1)
+        if self.busy:
+            return
+        y = self.position.y + random.uniform(2, -2)
+        x = self.position.x + random.uniform(2, -2)
         self.position = Position(x, y)
 
     def take_damage(self, dmg: int) -> bool:
@@ -94,8 +92,9 @@ class Contestant:
         self.logger.chose(self, chose.name)
         return chose
 
-    def get_decision_base(self) -> ActionChoice.Base:
-        return make_decision_base(self)
+    def get_decision_base(self, players_in_radius) -> ActionChoice.Base:
+        # return make_decision_base(self, players_in_radius)
+        return ActionChoice.Base.FIGHT, players_in_radius
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

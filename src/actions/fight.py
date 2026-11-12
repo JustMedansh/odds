@@ -19,6 +19,7 @@ if TYPE_CHECKING:
 # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
 class Fight(ActionBase):
+    """take two contestants and make them fight"""
     def __init__(self, gc, game, c: list[Contestant]):
         super().__init__(gc, game)
         self.contestants = c

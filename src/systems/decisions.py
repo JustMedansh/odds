@@ -44,7 +44,7 @@ def add_noise(stats: DecisionStats, amount: float = 0.1) -> DecisionStats:
         for field in stats._fields
     })
 
-def make_decision_base(contestant: Contestant, choices: list[ActionChoice.Base] | None = None) -> ActionChoice.Base:
+def make_decision_base(contestant: Contestant, players_in_radius: list[Contestant], choices: list[ActionChoice.Base] | None = None) -> ActionChoice.Base:
     """Returns a decision according to ActionChoice.Base"""
     if choices is None:
         choices = [ActionChoice.Base.LOOT, ActionChoice.Base.FIGHT, ActionChoice.Base.REST]
@@ -63,7 +63,10 @@ def make_decision_base(contestant: Contestant, choices: list[ActionChoice.Base] 
     if not any(weights):
         return random.choice(choices)
 
-    return random.choices(choices, weights, k=1)[0]
+    chosen = random.choices(choices, weights, k=1)[0]
+    if chosen == ActionChoice.Base.FIGHT:
+        return chosen, players_in_radius
+    return chosen, []
 
 def make_decision_fight(contestant: Contestant, choices: list[ActionChoice.Fight] | None = None) -> ActionChoice.Fight:
     """Returns a decision according to ActionChoice.Fight"""

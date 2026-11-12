@@ -28,6 +28,7 @@ class Logger:
         color: str | None = None,
         attrs: list[str] | None = None,
     ) -> None:
+        
         if self.level >= level:
             print(colored(message, color, attrs=attrs))
 

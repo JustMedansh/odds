@@ -18,10 +18,12 @@ class Game:
     def __init__(self, logger_state: bool | LogLevel = LogLevel.INFO):
         self.fights = 0
         self.events = []
+
         if isinstance(logger_state, bool):
             logger_level = LogLevel.INFO if logger_state else LogLevel.QUIET
         else:
             logger_level = LogLevel(logger_state)
+
         self.logger = Logger(logger_level)
         self.gc = GroupedContestants(self.logger)
         self.time = 0
@@ -75,7 +77,7 @@ class Game:
                 self.world_map.update_position(c, c.position)
 
             decisions = self.get_decisions()
-            self.assign_fighters(decisions[ActionChoice.Base.FIGHT])
+            self.assign_fighters(decisions[ActionChoice.Base.FIGHT], decisions)
             self.assign_looters(decisions[ActionChoice.Base.LOOT])
 
             if not self.renderer.update_renderer():
@@ -86,33 +88,76 @@ class Game:
 
         return self.gc, self.fights, self.get_winner()
 
-    def assign_fighters(self, fighters_orig):
+    def get_decision(self, c: Contestant, decisions: dict):
+        for action, choosers_tup in decisions.items():
+            # chooser is something like [(c, list of possibles)]
+            choosers = [co for co, _ in choosers_tup]
+            if c in choosers:
+                return action
+
+        return None
+
+    def assign_fighters(self, fighters_orig, decisions):
         fighters = copy(fighters_orig)
-        for _ in range(len(fighters) // 2):
-            random.shuffle(fighters)
-            fighter_a = fighters.pop()
-            fighter_b = fighters.pop()
+        # for fight, [(contestant, [list of possible fighters], (contestant, [...])]
+        # we need to do something so that {fighter: opponents that also chose fight}
+
+        possible_opponents = {}
+
+        for fighter, possibles in fighters_orig: # contestant, [list of contestants]
+            possible_opponents[fighter] = [p for p in possibles 
+                                           if self.get_decision(p, decisions) == ActionChoice.Base.FIGHT]
+
+        for fighter, possibles in copy(possible_opponents).items():
+            if fighter not in possible_opponents:
+                continue
+
+            fighter_a = fighter
+            try:
+                fighter_b = random.choice([p for p in possibles if p in possible_opponents])
+            except IndexError:
+                # raise IndexError
+                continue
 
             self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
 
+
+        # for _ in range(len(fighters) // 2):
+        #     random.shuffle(fighters)
+        #     fighter_a = fighters.pop()
+        #     fighter_b = fighters.pop()
+
+        #     self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
+
     def assign_looters(self, looters_orig):
-        looters =  copy(looters_orig)
+        looters = copy(looters_orig) # [(looter, [])]
         for _ in range(len(looters)):
             random.shuffle(looters)
-            looter = looters.pop()
-    
+            looter_tup = looters.pop()
+            looter, _ = looter_tup
+
             self.event_initializer(ActionChoice.Base.LOOT, (looter,))
 
     def get_decisions(self) -> list[ActionChoice.Base]:
         decisions = {}
         for c in self.gc.get_available_contestants():
-            decisions[c] = c.get_decision_base()
+            decisions[c] = c.get_decision_base(self.world_map.get_contestants_in_radius(c, 5, self.gc))
+            # c: a
 
         # return decisions
         grouped_decisions = {}
 
         for action in ActionChoice.Base:
-            grouped_decisions[action] = [c for c, a in decisions.items() if a == action]
+            # grouped_decisions[action] = [c for c, a in decisions.items() if a == action] # THE FUCKING ISSUE
+            grouped_decisions[action] = []
+        
+        for contestant, action_tup in decisions.items():
+            action, cs = action_tup
+            if action in grouped_decisions:
+                grouped_decisions[action].append((contestant, cs))
+            else:
+                grouped_decisions[action] = [(contestant, cs)]
+            # c:a, where issue??
 
         return grouped_decisions
 

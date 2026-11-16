@@ -1,5 +1,5 @@
 import pytest
-from src.actions.encounter import Encounter
+from actions.combat.encounter import Encounter
 from src.contestants.contestant import Contestant
 
 @pytest.fixture

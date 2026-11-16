@@ -1,10 +1,10 @@
 from __future__ import annotations
-
+from dataclasses import dataclass
 import random
 from typing import TYPE_CHECKING
 
-from .action_base import ActionBase
-from .choices import ActionChoice
+from ..action_base import ActionBase
+from ..choices import ActionChoice
 
 if TYPE_CHECKING:
     from src.contestants.contestant import Contestant
@@ -13,26 +13,24 @@ if TYPE_CHECKING:
 
 # each contestant is sent the opponent
 # they can choose to FLEE, ATTACK, DEFEND, DODGE, NOTHING
-# FLEE: 30% chance of failing, but the fight ends. Else, full damage to contestant and third of original damage to opponent
+# FLEE: 30% chance of failing, but the combat ends. Else, full damage to contestant and third of original damage to opponent
 # ATTACK: Proceed wiht normal attack
 # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
 # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-class Fight(ActionBase):
-    """take two contestants and make them fight"""
-    def __init__(self, gc, game, c: list[Contestant]):
-        super().__init__(gc, game)
-        self.contestants = c
-        self.elapsed_time = 0
+class Combat(ActionBase):
+    """Simulate a single fight round."""
+    def __init__(self):
+        pass
 
     def reset_multipliers(self, *contestants: Contestant):
         for c in contestants:
             c.damage_multiplier = 1
             c.health_multiplier = 1
 
-    def update(self) -> bool:
-        """Advance this fight by one game tick; return whether it is resolved."""
-        contestant_a, contestant_b = self.contestants
+    def stage(self, contestants: list[Contestant]) -> bool:
+        """Advance this combat by one game tick; return whether it is still active."""
+        contestant_a, contestant_b = tuple(self.contestants)
 
         if self.elapsed_time % 4 == 0:
             self.reset_multipliers(contestant_a, contestant_b)
@@ -41,7 +39,6 @@ class Fight(ActionBase):
 
         self.elapsed_time += 1
         return False
-
 
     def resolve_turn(self, contestant_a: Contestant, contestant_b: Contestant) -> tuple[Contestant, Contestant] | bool:
         """Resolve a single turn between two contestants"""
@@ -52,21 +49,21 @@ class Fight(ActionBase):
             "weapon": 3,
         }
 
-        fight_dispatcher = {
-            ActionChoice.Fight.FLEE: self.flee_handler,
-            ActionChoice.Fight.ATTACK: self.attack_handler,
-            ActionChoice.Fight.DEFEND: self.defend_handler,
-            ActionChoice.Fight.DODGE: self.dodge_handler,
+        combat_dispatcher = {
+            ActionChoice.Combat.GameEnding.FLEE: self.flee_handler,
+            ActionChoice.Combat.Offensive.ATTACK: self.attack_handler,
+            ActionChoice.Combat.Defensive.DEFEND: self.defend_handler,
+            ActionChoice.Combat.Defensive.DODGE: self.dodge_handler,
         }
 
-        choice_a = contestant_a.get_decision_fight(contestant_b)
-        choice_b = contestant_b.get_decision_fight(contestant_a)
+        choice_a = contestant_a.get_decision_combat(contestant_b)
+        choice_b = contestant_b.get_decision_combat(contestant_a)
 
-        result_a = fight_dispatcher[choice_a](contestant_a)
-        result_b = fight_dispatcher[choice_b](contestant_b)
+        result_a = combat_dispatcher[choice_a](contestant_a)
+        result_b = combat_dispatcher[choice_b](contestant_b)
 
-        resolve_hit_a = choice_a == ActionChoice.Fight.ATTACK
-        resolve_hit_b = choice_b == ActionChoice.Fight.ATTACK
+        resolve_hit_a = choice_a == ActionChoice.Combat.Offensive.ATTACK
+        resolve_hit_b = choice_b == ActionChoice.Combat.Offensive.ATTACK
 
         if not result_a or not result_b:
             return contestant_a, contestant_b
@@ -156,6 +153,14 @@ class Fight(ActionBase):
         target.take_damage(damage)
 
         return False
+
+
+@dataclass
+class CombatDecision:
+    offensive: tuple[Contestant, ActionChoice] | None
+    defensive: dict[Contestant, ActionChoice] | None
+    fleeing: bool = False
+
 
 # class CombatEntity:
 #     """A class managing combat for a contestant or group of contestants"""

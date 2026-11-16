@@ -47,14 +47,14 @@ def add_noise(stats: DecisionStats, amount: float = 0.1) -> DecisionStats:
 def make_decision_base(contestant: Contestant, players_in_radius: list[Contestant], choices: list[ActionChoice.Base] | None = None) -> ActionChoice.Base:
     """Returns a decision according to ActionChoice.Base"""
     if choices is None:
-        choices = [ActionChoice.Base.LOOT, ActionChoice.Base.FIGHT, ActionChoice.Base.REST]
+        choices = [ActionChoice.Base.LOOT, ActionChoice.Base.COMBAT, ActionChoice.Base.REST]
 
     stats = get_decision_stats(contestant)
     stats = add_noise(stats)
 
     utilities = {
         ActionChoice.Base.LOOT: 1 - stats.gear,
-        ActionChoice.Base.FIGHT: stats.health_fraction * stats.readiness,
+        ActionChoice.Base.COMBAT: stats.health_fraction * stats.readiness,
         ActionChoice.Base.REST: 1 - stats.health_fraction,
     }
 
@@ -64,25 +64,31 @@ def make_decision_base(contestant: Contestant, players_in_radius: list[Contestan
         return random.choice(choices)
 
     chosen = random.choices(choices, weights, k=1)[0]
-    if chosen == ActionChoice.Base.FIGHT:
+    if chosen == ActionChoice.Base.COMBAT:
         return chosen, players_in_radius
     return chosen, []
 
-def make_decision_fight(contestant: Contestant, choices: list[ActionChoice.Fight] | None = None) -> ActionChoice.Fight:
-    """Returns a decision according to ActionChoice.Fight"""
+
+def make_decision_combat(
+    contestant: Contestant,
+    choices: list[ActionChoice.Combat.Offensive | ActionChoice.Combat.Defensive | ActionChoice.Combat.GameEnding] | None = None,
+) -> ActionChoice.Combat.Offensive | ActionChoice.Combat.Defensive | ActionChoice.Combat.GameEnding:
+    """Return a combat decision based on the contestant's stats."""
     if choices is None:
-        choices = [ActionChoice.Fight.ATTACK, ActionChoice.Fight.DEFEND, ActionChoice.Fight.DODGE, ActionChoice.Fight.FLEE]
-    
-    stats = get_decision_stats(contestant)
-    stats = add_noise(stats)
+        choices = [
+            ActionChoice.Combat.Offensive.ATTACK,
+            ActionChoice.Combat.Defensive.DEFEND,
+            ActionChoice.Combat.Defensive.DODGE,
+            ActionChoice.Combat.GameEnding.FLEE,
+        ]
 
+    stats = add_noise(get_decision_stats(contestant))
     utilities = {
-        ActionChoice.Fight.ATTACK: stats.readiness,
-        ActionChoice.Fight.DEFEND: stats.armor_fraction, 
-        ActionChoice.Fight.DODGE: stats.agility_fraction, 
-        ActionChoice.Fight.FLEE: (1 - stats.health_fraction) / 1.5
+        ActionChoice.Combat.Offensive.ATTACK: stats.readiness,
+        ActionChoice.Combat.Defensive.DEFEND: stats.armor_fraction,
+        ActionChoice.Combat.Defensive.DODGE: stats.agility_fraction,
+        ActionChoice.Combat.GameEnding.FLEE: (1 - stats.health_fraction) / 1.5,
     }
-
     weights = [utilities[action] for action in choices]
 
     if not any(weights):

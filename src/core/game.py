@@ -4,7 +4,7 @@ from time import sleep
 import random
 from src.contestants.manager import load_contestants
 from src.contestants.grouped_contestant import GroupedContestants
-from src.actions import Fight, Scavenge
+from src.actions import Combat, Scavenge
 from src.actions.choices import ActionChoice
 from src.logger import Logger, LogLevel
 from src.core.map import Position, WorldMap
@@ -16,7 +16,7 @@ if TYPE_CHECKING:
 
 class Game:
     def __init__(self, logger_state: bool | LogLevel = LogLevel.INFO):
-        self.fights = 0
+        self.combats = 0
         self.events = []
 
         if isinstance(logger_state, bool):
@@ -34,7 +34,7 @@ class Game:
 
     def event_initializer(self, event: ActionChoice.Base, contestants: tuple[Contestant]):
         event_dispatcher = {
-            ActionChoice.Base.FIGHT: Fight,
+            ActionChoice.Base.COMBAT: Combat,
             ActionChoice.Base.LOOT: Scavenge,
         }
 
@@ -42,14 +42,14 @@ class Game:
         active_event = event_class(self.gc, self, list(contestants))
         self.events.append(active_event)
 
-        if event == ActionChoice.Base.FIGHT:
-            self.fights += 1
+        if event == ActionChoice.Base.COMBAT:
+            self.combats += 1
 
         for contestant in contestants:
             contestant.busy = True
 
-        if event == ActionChoice.Base.FIGHT:
-            self.logger.fighting(*contestants)
+        if event == ActionChoice.Base.COMBAT:
+            self.logger.combat_started(*contestants)
 
     def maintain_events(self):
         for event in self.events.copy():
@@ -77,7 +77,7 @@ class Game:
                 self.world_map.update_position(c, c.position)
 
             decisions = self.get_decisions()
-            self.assign_fighters(decisions[ActionChoice.Base.FIGHT], decisions)
+            self.assign_combatants(decisions[ActionChoice.Base.COMBAT], decisions)
             self.assign_looters(decisions[ActionChoice.Base.LOOT])
 
             if not self.renderer.update_renderer():
@@ -86,7 +86,7 @@ class Game:
             self.time += 1
             # run_renderer(self.world_map, 64)
 
-        return self.gc, self.fights, self.get_winner()
+        return self.gc, self.combats, self.get_winner()
 
     def get_decision(self, c: Contestant, decisions: dict):
         for action, choosers_tup in decisions.items():
@@ -97,37 +97,37 @@ class Game:
 
         return None
 
-    def assign_fighters(self, fighters_orig, decisions):
-        fighters = copy(fighters_orig)
-        # for fight, [(contestant, [list of possible fighters], (contestant, [...])]
-        # we need to do something so that {fighter: opponents that also chose fight}
+    def assign_combatants(self, combatants_orig, decisions):
+        combatants = copy(combatants_orig)
+        # for combat, [(contestant, [list of possible combatants], (contestant, [...])]
+        # we need to do something so that {combatant: opponents that also chose combat}
 
-        possible_opponents = {}
+        possible_combatants = {}
 
-        for fighter, possibles in fighters_orig: # contestant, [list of contestants]
-            possible_opponents[fighter] = [p for p in possibles 
-                                           if self.get_decision(p, decisions) == ActionChoice.Base.FIGHT]
+        for combatant, possibles in combatants_orig: # contestant, [list of contestants]
+            possible_combatants[combatant] = [p for p in possibles
+                                           if self.get_decision(p, decisions) == ActionChoice.Base.COMBAT]
 
-        for fighter, possibles in copy(possible_opponents).items():
-            if fighter not in possible_opponents:
+        for combatant, possibles in copy(possible_combatants).items():
+            if combatant not in possible_combatants:
                 continue
 
-            fighter_a = fighter
+            combatant_a = combatant
             try:
-                fighter_b = random.choice([p for p in possibles if p in possible_opponents])
+                combatant_b = random.choice([p for p in possibles if p in possible_combatants])
             except IndexError:
                 # raise IndexError
                 continue
 
-            self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
+            self.event_initializer(ActionChoice.Base.COMBAT, (combatant_a, combatant_b))
 
 
-        # for _ in range(len(fighters) // 2):
-        #     random.shuffle(fighters)
-        #     fighter_a = fighters.pop()
-        #     fighter_b = fighters.pop()
+        # for _ in range(len(combatants) // 2):
+        #     random.shuffle(combatants)
+        #     combatant_a = combatants.pop()
+        #     combatant_b = combatants.pop()
 
-        #     self.event_initializer(ActionChoice.Base.FIGHT, (fighter_a, fighter_b))
+        #     self.event_initializer(ActionChoice.Base.COMBAT, (combatant_a, combatant_b))
 
     def assign_looters(self, looters_orig):
         looters = copy(looters_orig) # [(looter, [])]
@@ -150,7 +150,7 @@ class Game:
         for action in ActionChoice.Base:
             # grouped_decisions[action] = [c for c, a in decisions.items() if a == action] # THE FUCKING ISSUE
             grouped_decisions[action] = []
-        
+
         for contestant, action_tup in decisions.items():
             action, cs = action_tup
             if action in grouped_decisions:

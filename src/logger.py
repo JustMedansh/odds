@@ -47,7 +47,7 @@ class Logger:
     def dmg_both(self, t1: Contestant, t2: Contestant) -> None:
         self._log(f"Both {t1.name} and {t2.name} took damage.", color="red")
 
-    def fighting(self, t1: Contestant, t2: Contestant) -> None:
+    def combat_started(self, t1: Contestant, t2: Contestant) -> None:
         self._log(f"{t1.name} and {t2.name} started fighting.", color="magenta")
 
     def found(self, t: Contestant, loot: str, units: int | None = None) -> None:

@@ -47,7 +47,7 @@ class GroupedContestants:
         ]
 
     def get_available_contestants(self) -> list[Contestant]:
-        """Return a list of not-fighting alive contestants"""
+        """Return a list of not-in-combat alive contestants"""
         return [
             contestant
             for contestant in self.get_alive_contestants()

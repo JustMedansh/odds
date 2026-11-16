@@ -10,16 +10,16 @@ def run_statistics(games: int = 10_000, progress_interval: int = 100) -> None:
 
     winners = Counter()
     
-    total_fights = 0
+    total_combats = 0
     total_health = 0
     total_weapon = 0
     total_armor = 0
 
     print(f"Running {games} simulations...", flush=True)
     for game_number in range(1, games + 1):
-        game, fights, winner = run_simulation(False)
+        game, combats, winner = run_simulation(False)
 
-        total_fights += fights
+        total_combats += combats
 
         if game_number % progress_interval == 0 or game_number == games:
             print(f"Simulated {game_number}/{games} games...", flush=True)
@@ -41,7 +41,7 @@ def run_statistics(games: int = 10_000, progress_interval: int = 100) -> None:
 
     print("\n=== Statistics ===")
     print(f"Games: {games}")
-    print(f"Average fights/game: {total_fights / games:.2f}")
+    print(f"Average combats/game: {total_combats / games:.2f}")
 
     if winners_count:
         print(f"Average winner health: {total_health / winners_count:.2f}")

@@ -3,9 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 import random
 from src.logger import Logger
-from src.systems.decisions import make_decision_base, make_decision_fight
+from src.systems.decisions import make_decision_base, make_decision_combat
 from src.actions.choices import ActionChoice
 from src.core.map import Position, WorldMap
+from src.actions.combat.combat import CombatDecision
 
 @dataclass
 class Stats:
@@ -15,11 +16,9 @@ class Stats:
     perception: float = field(init=False)
     agility: float = field(init=False)
     survivability: float = field(init=False)
-    agility: float = field(init=False)
 
     def __post_init__(self):
         self.perception = (self.intelligence * 0.8) + (self.social * 0.2)
-        self.agility = (self.intelligence * 0.6) + (self.strength * 0.4)
         self.survivability = (self.intelligence + self.strength) * 0.2
         self.agility = (self.intelligence * 0.7) + (self.strength * 0.3) 
 
@@ -51,12 +50,19 @@ class Contestant:
     def __repr__(self):
         return f"{self.name}: {self.health}"
 
+    def get_target_scores(self, opponents: list[Contestant]) -> dict[Contestant, float]:
+        return {x: random.uniform(0, 1) for x in opponents}
+
     def move_random_dir(self):
         if self.busy:
             return
         y = self.position.y + random.uniform(2, -2)
         x = self.position.x + random.uniform(2, -2)
         self.position = Position(x, y)
+
+    def choose_attack(self, opponents: list[Contestant]):
+        # this belongs in decisions
+        return random.choice(opponents)
 
     def take_damage(self, dmg: int) -> bool:
         """Simulate taking damage"""
@@ -82,19 +88,24 @@ class Contestant:
         self.health = min(100, self.health + amt)
         self.logger.heal(self, amt)
 
-    def get_decision_fight(self, opponent: Contestant) -> ActionChoice.Fight:
-        # FLEE: 30% chance of failing, but the fight ends. Else, full damage to contestant and third of original damage to opponent
+    def get_decision_combat(self, opponents: list[Contestant]) -> ActionChoice.Combat.Offensive | ActionChoice.Combat.Defensive | ActionChoice.Combat.GameEnding:
+        # FLEE: 30% chance of failing, but the combat ends. Else, full damage to contestant and third of original damage to opponent
         # ATTACK: Proceed wiht normal attack
         # DEFEND: Oncoming damage is reduced by a random amount between 0 to 80, but no damage is incurred by opponent 
         # DODGE: 50% chance of failing (increases with intelligence (major) and strength (minor)) but no damage is incurred
 
-        chose = make_decision_fight(self)
+        chose = make_decision_combat(self)
+        opponent = random.choice(opponents) if chose == ActionChoice.Combat.Offensive else None
         self.logger.chose(self, chose.name)
-        return chose
+
+        return CombatDecision(
+            action=chose,
+            opponent=opponent
+        )
 
     def get_decision_base(self, players_in_radius) -> ActionChoice.Base:
         # return make_decision_base(self, players_in_radius)
-        return ActionChoice.Base.FIGHT, players_in_radius
+        return ActionChoice.Base.COMBAT, players_in_radius
 
 def random_contestant(count: int) -> list[Contestant]:
     MALE_NAMES = [

@@ -35,7 +35,7 @@ def get_attribute_value(tag: StrEnum) -> float:
     """Return a random value for attribute type (very low, low, ...)"""
 
     ATTRIBUTE_TABLE = {
-        "very_low": (0.5, 2),
+        "very_low": (1, 2),
         "low": (2, 4),
         "average": (4, 6),
         "high": (6, 8),

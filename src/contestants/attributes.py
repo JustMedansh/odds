@@ -1,33 +1,22 @@
-import random
 from .tags import StatTags, get_attribute_value
-from dataclasses import dataclass, field
-from enum import Enum, auto
+from dataclasses import dataclass, field, fields
+from .generation import GenerationBias, generate_value, BIAS_TABLE
 
-class GenerationBias(Enum):
-    LOW = auto()
-    NORMAL = auto()
-    HIGH = auto()
+def generate_attributes(instance: dataclass):
+    """Generate attribute values for given instance of Personality or Skills. To be used in __post_init__"""
+    for attribute in fields(instance):
+        # TODO: add tag based generation
+        if attribute.name == "tags":
+            continue
 
-def generate_value(minimum: int, maximum: int, bias: GenerationBias) -> float:
-    values = range(minimum, maximum)
-    weights = generate_weights(minimum, maximum, bias)
+        bias_key = GenerationBias.NORMAL
+        low, high = BIAS_TABLE[bias_key]
 
-    return random.choices(values, weights, k=1)[0]
-
-def generate_weights(minimum: int, maximum: int, bias: GenerationBias) -> float:
-    count = maximum - minimum + 1
-
-    if bias == GenerationBias.NORMAL:
-        midpoint = (count - 1) / 2
-        weights = [count - abs(i - midpoint) for i in range(count)]
-
-    elif bias == GenerationBias.LOW:
-        weights = list(range(count, 0, -1))
-
-    elif bias == GenerationBias.HIGH:
-        weights = list(range(1, count + 1))
-
-    return weights
+        setattr(
+            instance,
+            attribute.name,
+            generate_value(low, high, bias_key)
+        )
 
 @dataclass
 class Stats:
@@ -73,6 +62,25 @@ class Personality:
     impulsivity: int = field(init=False)
     curiosity: int = field(init=False)
     aggression: int = field(init=False)
+    courage: int = field(init=False)
 
     def __post_init__(self):
-        ...
+        generate_attributes(self)
+
+@dataclass 
+class Skills:
+    """Affects proficiency at specific actions. Skills are learnable."""    
+    tags: set = field(default_factory=set)
+
+    cooking: int = field(init=False)
+    healing: int = field(init=False)
+    stealth: int = field(init=False) # stealth
+    craftsmanship: int = field(init=False) # manipulating env, makeshift, improvisation
+    engineering: int = field(init=False) # mechanics and electrical
+    aiming: int = field(init=False) # increases accuracy with ranged projectile.
+    fishing: int = field(init=False)
+    scavenging: int = field(init=False)
+    trapping: int = field(init=False)
+
+    def __post_init__(self):
+        generate_attributes(self)

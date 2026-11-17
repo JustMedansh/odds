@@ -2,10 +2,23 @@ from .tags import StatTags, get_attribute_value
 from dataclasses import dataclass, field, fields
 from .generation import GenerationBias, generate_value, BIAS_TABLE
 
-def generate_attributes(instance: dataclass):
+def validate_tags(tags: set) -> None:
+    """Validate that no conflicting tags are present"""
+    targets = {}
+
+    for tag in tags:
+        targets.setdefault(tag.bias_target, []).append(tag)
+
+    for group in targets.values():
+        if len(group) > 1:
+            raise ValueError(f"Conflicting tags: {tuple(group)}")
+
+def generate_attributes(instance: Skills | Personality):
     """Generate attribute values for given instance of Personality or Skills. To be used in __post_init__"""
+
+    validate_tags(instance.tags)
+
     for attribute in fields(instance):
-        # TODO: add tag based generation
         if attribute.name == "tags":
             continue
 
@@ -59,7 +72,7 @@ class Personality:
     selflessness: int = field(init=False)
     empathy: int = field(init=False)
     caution: int = field(init=False)
-    impulsivity: int = field(init=False)
+    impulsiveness: int = field(init=False)
     curiosity: int = field(init=False)
     aggression: int = field(init=False)
     courage: int = field(init=False)
@@ -81,6 +94,8 @@ class Skills:
     fishing: int = field(init=False)
     scavenging: int = field(init=False)
     trapping: int = field(init=False)
+    fire_starting: int = field(init=False)
+    swimming: int = field(init=False)
 
     def __post_init__(self):
         generate_attributes(self)

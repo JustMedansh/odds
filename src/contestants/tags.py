@@ -30,8 +30,17 @@ class StatTags:
     class SkillTraits(StrEnum):
         """Tags that affect Skills"""
         # (bias type, bias target)
-        CHEF = ("chef", GenerationBias.HIGH, "cooking")
-        MEDIC = ("medic", GenerationBias.HIGH, "healing")
+        CHEF = (auto(), GenerationBias.HIGH, "cooking")
+        MEDIC = (auto(), GenerationBias.HIGH, "healing")
+        SNEAK = (auto(), GenerationBias.HIGH, "stealth")
+        CRAFTSMAN = (auto(), GenerationBias.HIGH, "craftsmanship")
+        ENGINEER = (auto(), GenerationBias.HIGH, "engineering")
+        MARKSMAN = (auto(), GenerationBias.HIGH, "aiming")
+        FISHER = (auto(), GenerationBias.HIGH, "fishing")
+        SCAVENGER = (auto(), GenerationBias.HIGH, "scavenging")
+        TRAPPER = (auto(), GenerationBias.HIGH, "trapping") 
+        FIRE_STARTER = (auto(), GenerationBias.HIGH, "fire_starting")
+        SWIMMER = (auto(), GenerationBias.HIGH, "swimming")
 
         def __new__(cls, value, bias_type, bias_target):
             obj = str.__new__(cls, value)
@@ -43,23 +52,25 @@ class StatTags:
     class PersonalityTraits(StrEnum):
         """Tags that affect Personality"""
         # (bias type, bias target)
-        INTROVERT = (auto(), GenerationBias.LOW, "sociability")
-        EXTROVERT = (auto(), GenerationBias.HIGH, "sociability")
+
+        # --- NON PAIRED ---
+        SELFLESS = (auto(), GenerationBias.HIGH, "selflessness")
+        CAUTION = (auto(), GenerationBias.HIGH, "caution")
+        RECKLESS = (auto(), GenerationBias.HIGH, "impulsiveness")
+        CURIOUS = (auto(), GenerationBias.HIGH, "curiosity")
+
+        # --- PAIRED ---
+        LONER = (auto(), GenerationBias.LOW, "sociability")
+        SOCIALISER = (auto(), GenerationBias.HIGH, "sociability")
 
         SUBMISSIVE = (auto(), GenerationBias.LOW, "assertiveness")
         DOMINANT = (auto(), GenerationBias.HIGH, "assertiveness")
 
-        SELFLESS = (auto(), GenerationBias.HIGH, "selflessness")
+        INSENSITIVE = (auto(), GenerationBias.LOW, "empathy")
+        CARING = (auto(), GenerationBias.HIGH, "empathy")
 
-        CARING = (auto(), GenerationBias.HIGH, "selflessness")
-        INSENSITIVE = (auto(), GenerationBias.HIGH, "selflessness")
-
-        CAUTION = (auto(), GenerationBias.HIGH, "selflessness")
-        RECKLESS = (auto(), GenerationBias.HIGH, "selflessness")
-        CURIOUS = (auto(), GenerationBias.HIGH, "selflessness")
-
-        AGGRESSIVE = (auto(), GenerationBias.HIGH, "selflessness")
-        PASSIVE = (auto(), GenerationBias.HIGH, "selflessness")
+        PASSIVE = (auto(), GenerationBias.LOW, "aggression")
+        AGGRESSIVE = (auto(), GenerationBias.HIGH, "aggression")
 
         COWARD = (auto(), GenerationBias.LOW, "courage")
         BRAVE = (auto(), GenerationBias.HIGH, "courage")

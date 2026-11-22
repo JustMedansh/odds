@@ -10,3 +10,4 @@ class Rest(Action):
 
     def resolve(self):
         self.contestant.heal(self.elapsed_time * 0.5)
+        self.contestant.add_energy(self.elapsed_time)

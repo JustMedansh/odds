@@ -1,5 +1,12 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import random
-from ..actions_base import Action, Contestant
+from ..actions_base import Action
+
+if TYPE_CHECKING:
+    from src.contestants import Contestant
 
 class Attack(Action):
     def __init__(self, contestant: Contestant, opponent: Contestant):
@@ -9,6 +16,7 @@ class Attack(Action):
 
     def resolve(self):
         self.opponent.take_damage(self.calculate_damage())
+        self.contestant.reduce_energy(15)
 
     def calculate_damage(self):
         base_dmg = self.contestant.stats.offensive_power * random.uniform(0.5, 5)

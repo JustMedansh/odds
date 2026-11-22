@@ -7,7 +7,7 @@ class GenerationBias(Enum):
     HIGH = auto()
 
 def generate_value(minimum: int, maximum: int, bias: GenerationBias) -> float:
-    values = range(minimum, maximum)
+    values = range(minimum, maximum + 1)
     weights = generate_weights(minimum, maximum, bias)
 
     return random.choices(values, weights, k=1)[0]

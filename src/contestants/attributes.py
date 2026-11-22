@@ -40,6 +40,7 @@ class Stats:
     perception: float = field(init=False)
     agility: float = field(init=False)
     survivability: float = field(init=False)
+    offensive_power: float = field(init=False)
 
     def __post_init__(self):
         # Attributes
@@ -49,8 +50,9 @@ class Stats:
 
         # Specialized
         self.perception = (self.intelligence * 0.8) + (self.social * 0.2)
-        self.survivability = (self.intelligence + self.strength) * 0.5
+        self.survivability = (self.intelligence * 0.2) + (self.strength * 0.2)
         self.agility = (self.intelligence * 0.7) + (self.strength * 0.3)
+        self.offensive_power = (self.intelligence * 0.25) + (self.strength * 0.75)
 
     def _validate_attribute(self, name: str, tag: type[StatTags.Attribute]) -> None:
         value = getattr(self, name)

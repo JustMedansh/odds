@@ -1,6 +1,7 @@
 from __future__ import annotations
-from .attributes import Stats
+from .attributes import Stats, Personality, Skills
 from dataclasses import dataclass, field
+from src.map.world_map import Position
 import random
 
 @dataclass
@@ -9,8 +10,13 @@ class Contestant:
     name: str
     gender: str
     stats: Stats
+    personality: Personality = field(default_factory=Personality)
+    skills: Skills = field(default_factory=Skills)
 
     health: int = 100
+    energy: int = 100
+
+    position: Position = Position(0, 0)
 
     armor: float = 0.0
     weapon: float = 0.0
@@ -18,6 +24,10 @@ class Contestant:
     @property
     def alive(self) -> bool:
         return self.health > 0
+
+    def set_position(self, new_pos: Position) -> None:
+        """Set the position of the current contestant"""
+        self.position = new_pos
 
     def __str__(self):
         return f"{self.name}: {self.health}"
@@ -38,6 +48,23 @@ class Contestant:
             return
 
         self.health = min(100, self.health + amt)
+
+    def reduce_energy(self, amt: int) -> None:
+        """Reduce energy by given amount"""
+        if amt < 0:
+            raise ValueError("Reduction cannot be negative")
+        
+        self.energy = max(0, self.energy - amt)
+        
+    def add_energy(self, amt: int) -> None:
+        """Add energy to the contestant by given amount"""
+        if amt < 0:
+            raise ValueError("Addition cannot be negative")
+        
+        if not self.alive:
+            return
+
+        self.energy = min(100, self.energy + amt)
 
 def random_contestant(k: int) -> list[Contestant]:
     """Get k contestants with randomized values, max 50 (temp.)"""

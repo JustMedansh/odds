@@ -12,7 +12,7 @@ from src.contestants import Contestant, StatTags, Stats, get_attribute_value, ra
     ],
 )
 def test_stats_resolves_attribute_tags(monkeypatch, tag, attribute, expected):
-    monkeypatch.setattr("src.contestants.contestants.get_attribute_value", lambda _: expected)
+    monkeypatch.setattr("src.contestants.attributes.get_attribute_value", lambda _: expected)
 
     stats = Stats(strength=tag if attribute == "strength" else 5,
                   intelligence=tag if attribute == "intelligence" else 5,

@@ -13,13 +13,15 @@ class Contestant:
     personality: Personality = field(default_factory=Personality)
     skills: Skills = field(default_factory=Skills)
 
-    health: int = 100
-    energy: int = 100
+    health: float = 100
+    energy: float = 100
 
     position: Position = Position(0, 0)
 
     armor: float = 0.0
     weapon: float = 0.0
+
+    active_actions: list = field(default_factory=list)
 
     @property
     def alive(self) -> bool:

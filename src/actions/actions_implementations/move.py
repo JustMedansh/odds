@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from src.contestants import Contestant
 
 class Move(Action):
+    """Move in a specific direction, speed tiles a second"""
     def __init__(self, contestant: Contestant, direction: float, speed: float = 1):
         super().__init__(contestant)
         self.duration = None

@@ -1,6 +1,7 @@
 from ..actions_base import Action
 
 class Rest(Action):
+    """Default action when no action is taking place"""
     def __init__(self, contestant):
         super().__init__(contestant)
         self.duration = None

@@ -4,19 +4,22 @@ from typing import TYPE_CHECKING
 
 import random
 from ..actions_base import Action
+from ..fight_resolver import resolve_fighting
 
 if TYPE_CHECKING:
     from src.contestants import Contestant
 
 class Attack(Action):
+    """Attack a specfic entity"""
     def __init__(self, contestant: Contestant, opponent: Contestant):
         super().__init__(contestant)
         self.opponent = opponent
         self.duration = 2
 
     def resolve(self):
-        self.opponent.take_damage(self.calculate_damage())
-        self.contestant.reduce_energy(15)
+        if self.opponent.alive and self.contestant.alive:
+            resolve_fighting(self.calculate_damage(), self.contestant, self.opponent)
+            self.contestant.reduce_energy(15)
 
     def calculate_damage(self):
         base_dmg = self.contestant.stats.offensive_power * random.uniform(0.5, 5)

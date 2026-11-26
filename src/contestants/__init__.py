@@ -1,5 +1,5 @@
-from .tags import StatTags, get_attribute_value
-from .attributes import Personality, Skills, Stats
+from .profile.tags import StatTags, get_attribute_value
+from .profile.attributes import Personality, Skills, Stats
 from .contestants import Contestant, random_contestant
 
 __all__ = [

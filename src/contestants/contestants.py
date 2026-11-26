@@ -1,5 +1,5 @@
 from __future__ import annotations
-from .attributes import Stats, Personality, Skills
+from .profile.attributes import Stats, Personality, Skills
 from dataclasses import dataclass, field
 from src.map.world_map import Position
 import random

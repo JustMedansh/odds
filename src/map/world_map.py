@@ -66,7 +66,7 @@ class WorldMap:
         """Set the type of terrain at (x, y)"""
         self._validate_position_class(pos)
         x, y = pos.floored
-        self.terrain_map[y, x] = terrain
+        self.terrain_map[y, x] = terrain.value
 
     def fill_terrain(self, terrain: TerrainTypes) -> None:
         """Fill the entire map with a single terrain type"""
